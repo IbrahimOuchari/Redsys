@@ -433,27 +433,22 @@ class PurchaseRfq(models.Model):
     #     }
     def action_rfq_send(self):
         '''
-        This function opens a window to compose an email for the purchase RFQ,
-        with the appropriate email template loaded by default
+        This function sends an email for the purchase RFQ to each supplier,
+        using the appropriate email template.
         '''
         self.ensure_one()
 
-        # Define template IDs based on context
-        if self.env.context.get('send_rfq', False):
-            template_xmlid = 'purchase.email_template_edi_purchase_rfq'
-        else:
-            template_xmlid = 'purchase.email_template_edi_purchase_rfq_done'
+        # Define template ID
+        template_xmlid = 'purchase.email_template_edi_purchase_rfq'
 
-        # Safely get template and compose form IDs
+        # Safely get template ID
         template_id = self.env.ref(template_xmlid, raise_if_not_found=False)
-        compose_form = self.env.ref('mail.email_compose_message_wizard_form', raise_if_not_found=False)
+        if not template_id:
+            raise ValueError(_("Email template not found: %s") % template_xmlid)
 
-        if not template_id or not compose_form:
-            return self.env['ir.actions.actions']._for_xml_id('mail.action_view_mail_compose_message')
-
-        # Prepare context for the email composition
-        ctx = dict(self.env.context or {})
-        ctx.update({
+        # Prepare base context for the email composition
+        base_ctx = dict(self.env.context or {})
+        base_ctx.update({
             'default_model': 'purchase.rfq',
             'default_res_ids': self.ids,
             'default_template_id': template_id.id,
@@ -470,22 +465,29 @@ class PurchaseRfq(models.Model):
 
         self = self.with_context(lang=lang)
         if self.state in ['draft', 'sent']:
-            ctx['model_description'] = _('Request for Quotation')
+            base_ctx['model_description'] = _('Request for Quotation')
         else:
-            ctx['model_description'] = _('Purchase Order')
+            base_ctx['model_description'] = _('Purchase Order')
 
-        # Return window action
+        # Iterate over each supplier and send a separate email
+        for supplier in self.suppliers_ids:
+            # Create a new context for each supplier
+            ctx = base_ctx.copy()
+            ctx['default_partner_ids'] = [supplier.id]
+
+            # Render the email template with the current supplier
+            email_values = {
+                'email_to': supplier.email,
+                'partner_ids': [supplier.id],
+            }
+
+            # Send the email using the mail.template model
+            template_id.with_context(ctx).send_mail(self.id, force_send=True, raise_exception=True,
+                                                    email_values=email_values)
+
         return {
-            'name': _('Compose Email'),
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'mail.compose.message',
-            'views': [(compose_form.id, 'form')],
-            'view_id': compose_form.id,
-            'target': 'new',
-            'context': ctx,
+            'type': 'ir.actions.act_window_close',
         }
-
 
     # def print_quotation(self):
     #     self.write({'state': "sent"})
