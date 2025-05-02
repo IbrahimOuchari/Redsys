@@ -15,6 +15,7 @@ from odoo.addons.iap.tools import iap_tools
 from odoo.addons.mail.tools import mail_validation
 from odoo.addons.phone_validation.tools import phone_validation
 from odoo.exceptions import UserError, AccessError
+
 from odoo.osv import expression
 from odoo.tools.translate import _
 from odoo.tools import date_utils, email_split, is_html_empty, groupby, parse_contact_from_email
@@ -2787,24 +2788,46 @@ class Lead(models.Model):
             lead.final_product_list_ids = [(5, 0, 0)] + final_lines
 
 
-
     def action_create_rfq(self):
-        # Prepare a list for saving the customer info
-        purchase_rfq_vals = []
-        # Setting Conditions before starting to work
-        if not self.final_product_list_generated or not self.final_product_list_generated:
-            raise UserError("There is no Final Products list Generated")
-        if not self.partner_id :
-            raise UserError("Please choose a Customer first")
+        # Check preconditions before creating the RFQ
+        if not self.final_product_list_ids or not self.final_product_list_generated:
+            raise UserError("No final product list has been generated.")
+        if not self.partner_id:
+            raise UserError("Please select a customer first.")
         if not self.partner_id.email:
-            raise UserError("Customer must have a atleast an email")
+            raise UserError("The customer must have at least one email address.")
 
-
-        # Setting the list before creating purchase rfq
+        # Prepare the values for creating the purchase RFQ
         purchase_rfq_vals = {
-            'partner_id':self.partner_id.id,
+            'partner_id': self.partner_id.id,
+            'crm_lead_id': self.id,
+            # Add more fields as needed
         }
-        # creating purchase rfq with purchase_rfq_vals
+
+        # Create the purchase RFQ
         purchase_rfq = self.env['purchase.rfq'].create(purchase_rfq_vals)
+
+        # Create RFQ lines
+        for rfq_line in self.final_product_list_ids:
+            self.env['purchase.rfq.line'].create({
+                'order_id': purchase_rfq.id,
+                'product_id':rfq_line.product_template_id.id,
+                'barcode': rfq_line.barcode,
+                'name': rfq_line.description,
+                'product_qty': rfq_line.quantity,
+                'product_uom': rfq_line.uom_id.id,
+            })
+
+        # Return a success notification
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': "Success",
+                'message': "The RFQ has been successfully created.",
+                'type': 'success',  # types: success, warning, danger, info
+                'sticky': False,
+            }
+        }
 
 

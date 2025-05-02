@@ -81,6 +81,7 @@
                         <h1 class="d-flex">
                             <field name="priority" widget="priority" class="me-3"/>
                             <field name="name" readonly="1"/>
+                            <field name="crm_lead_id" invisible="1"/>
                         </h1>
                     </div>
                     <group>
@@ -167,6 +168,7 @@
                                     <field name="name" widget="section_and_note_text"/>
                                     <field name="date_planned" optional="hide" required="not display_type"
                                            force_save="1"/>
+                                    <field name="barcode" string="PN"/>
                                     <field name="product_qty"/>
                                     <field name="product_uom" string="UoM" groups="uom.group_uom"
                                            readonly="state in ('purchase', 'cancel')"
