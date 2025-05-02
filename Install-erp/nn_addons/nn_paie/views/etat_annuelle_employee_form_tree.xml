@@ -1,0 +1,92 @@
+<odoo>
+
+    <!-- Tree View for EtatAnnuelleEmployee -->
+    <record id="view_etat_annuelle_employee_tree" model="ir.ui.view">
+        <field name="name">etat.annuelle.employee.tree</field>
+        <field name="model">etat.annuelle.employee</field>
+        <field name="arch" type="xml">
+            <tree string="État Annuelle Employee">
+                <field name="name"/>
+                <field name="annee"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for EtatAnuelleEmployee -->
+    <record id="view_etat_annuelle_employee_form" model="ir.ui.view">
+        <field name="name">etat.annuelle.employee.form</field>
+        <field name="model">etat.annuelle.employee</field>
+        <field name="arch" type="xml">
+            <form string="État Annuelle Employee">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="generate_employee_lines" type="object" string="Générer les Lignes"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="update" type="object" string="Mise à jour"
+                            class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <!-- Button to manually change state to 'confirmed' -->
+                    <button name="action_manual_state_change" type="object" string="Changer l'état en confirmé"
+                            invisible="1"
+                            class="oe_highlight"/>
+                    <button string="lock" name="action_etat_lock" type="object" invisibal="done"
+                                class="oe_highlight"/>
+                    <button name="%(nn_paie.report_etat_annuelle_employee)d"
+                            string="Imprimer PDF"
+                            type="action"
+                            class="oe_highlight"
+                    invisible="state not in ('confirmed', 'close')"/>
+                    <button name="%(nn_paie.report_etat_annuelle_employee_specific)d"
+                            string="Imprimer PDF Specific"
+                            type="action"
+                            class="oe_highlight"
+                    invisible="state not in ('confirmed', 'close')"/>
+
+
+
+
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="annee"/>
+                    </group>
+                    <notebook>
+                        <page string="Lignes des annuelles des employees">
+                            <field name="annual_employee_line_ids">
+                                <tree string="Lignes des annuelle employee" editable="bottom">
+                                    <field name="selected" widget="boolean_toggle"
+                                           options="{'quick_create': false}"
+                                           modifier="{'readonly': [('parent.state', '=', 'draft')]}"
+                                           force_save="1"/>
+                                    <field name="matricule"/>
+                                    <field name="employe_id"/>
+                                    <field name="salaire_imposable" digits="[0, 3]"/>
+                                    <field name="impot" digits="[0, 3]"/>
+                                    <field name="css" digits="[0, 3]"/>
+                                    <field name="impot_du" digits="[0, 3]"/>
+
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for EtatAvancesMensuelles -->
+    <record id="action_etat_annuelle_employee_tree" model="ir.actions.act_window">
+        <field name="name">État Annuelle Employee</field>
+        <field name="res_model">etat.annuelle.employee</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_etat_anuelle_employee"
+              name="État Annuelle Employee"
+              parent="menu_journal_paie_analyse"
+              action="action_etat_annuelle_employee_tree"
+
+    />
+
+</odoo>

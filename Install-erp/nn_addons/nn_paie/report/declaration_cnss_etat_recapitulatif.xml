@@ -1,0 +1,386 @@
+<odoo>
+    <data>
+        <!-- Définition d'un format papier personnalisé en portrait avec marges ajustées -->
+        <record id="paperformat_cnss_recapitulatif_portrait" model="report.paperformat">
+            <field name="name">État Récapitulatif des Salaires Déclarés - Portrait</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">4</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">25</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- Définition du rapport - inchangé -->
+        <record id="action_report_declaration_cnss_etat" model="ir.actions.report">
+            <field name="name">État Récapitulatif des Salaires Déclarés</field>
+            <field name="model">declaration.cnss</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nn_paie.report_declaration_cnss_template</field>
+            <field name="report_file">nn_paie.report_declaration_cnss_template</field>
+            <field name="binding_model_id" ref="model_declaration_cnss"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="paperformat_cnss_recapitulatif_portrait"/>
+        </record>
+
+        <!-- Template QWeb du rapport avec tailles réduites -->
+        <template id="report_declaration_cnss_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <!-- Pas de layout externe pour correspondre à l'image -->
+                    <div class="article" style="font-family: Arial, sans-serif; margin: 0; padding: 15px;">
+                        <!-- Calculs des variables au niveau global - inchangés -->
+                        <t t-set="total_salaires" t-value="sum(o.declaration_cnss_line_ids.mapped('total'))"/>
+                        <t t-set="ss_taux" t-value="0.2675"/>
+                        <t t-set="at_taux" t-value="0.005"/>
+                        <t t-set="ss_amount" t-value="total_salaires * ss_taux"/>
+                        <t t-set="at_amount" t-value="total_salaires * at_taux"/>
+                        <t t-set="total_amount" t-value="ss_amount + at_amount"/>
+                        <t t-set="penalites" t-value="0"/>
+                        <t t-set="montant_final" t-value="total_amount + penalites"/>
+
+                        <!-- En-tête avec le logo et titre - taille réduite -->
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <!-- Logo CNSS - taille réduite -->
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <img src="/nn_paie/static/description/img.png" style="max-width: 75%; height: auto;"
+                                     alt="Logo CNSS"/>
+                            </div>
+
+                            <!-- Titre du document en arabe et français - taille réduite -->
+                            <div style="margin-top: 15px;">
+                                <h2 style="font-weight: bold; margin-bottom: 6px; font-size: 18px;">كشف إجمالي للأجور المصرح بها</h2>
+                                <h2 style="font-weight: bold; font-size: 18px;">Etat Récapitulatif des Salaires Déclarés</h2>
+                            </div>
+                        </div>
+
+                        <!-- Section principale divisée en blocs - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                                <!-- Bloc numéro employeur -->
+                                <td style="width: 29%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; margin-right: 5px; height: 95px;">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 5px; font-size: 13px; font-weight: bold;">
+                                            <span>رقم انخراط المؤجر</span>
+                                            <br/>
+                                            <span>Numéro Employeur</span>
+                                        </div>
+                                        <div style="text-align: center; padding: 18px; font-size: 18px; min-height: 30px; font-weight: bold;">
+                                            <span t-field="o.company_id.mat_cnss"/>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Bloc bureau -->
+                                <td style="width: 15%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; margin-right: 5px; height: 95px;">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 5px; font-size: 13px; font-weight: bold;">
+                                            <span>المكتب</span>
+                                            <br/>
+                                            <span>Bureau</span>
+                                        </div>
+                                        <div style="text-align: center; padding: 18px; font-size: 18px; min-height: 30px; font-weight: bold;">
+                                            <span t-field="o.company_id.bureau" t-if="o.company_id.bureau"/>
+                                            <span t-else="">P</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Bloc nom et adresse -->
+                                <td style="width: 50%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; height: 210px;">
+                                        <div style="padding: 15px; font-size: 14px; min-height: 80px;">
+                                            <span style="font-weight: bold;">Nom et adresse de l'employeur</span>
+                                            <span style="font-weight: bold; padding-right: 10px;">اسم وعنوان المؤجر</span>
+                                            <br/>
+                                            <strong>
+                                                <span>PP</span>
+                                            </strong>
+                                            <div style="font-weight: bold; font-size: 16px; margin-top: 8px;" t-field="o.company_id.name"/>
+                                            <div style="font-size: 14px; margin-top: 6px;" t-field="o.company_id.street"/>
+                                            <div style="font-size: 14px; margin-top: 4px;" t-field="o.company_id.city"/>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section trimestre, année, code exploitation - ajustée -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; margin-top: -120px;">
+                            <tr>
+                                <!-- Bloc trimestre -->
+                                <td style="width: 13%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; margin-right: 5px;">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 5px; font-size: 13px; font-weight: bold;">
+                                            <span>الثلاثية</span>
+                                            <br/>
+                                            <span>Trimestre</span>
+                                        </div>
+                                        <div style="text-align: center; padding: 12px; font-size: 16px; min-height: 25px; font-weight: bold;">
+                                            <span t-esc="o.trimestre[1]"/>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Bloc année -->
+                                <td style="width: 13%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; margin-right: 5px;">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 5px; font-size: 13px; font-weight: bold;">
+                                            <span>السنة</span>
+                                            <br/>
+                                            <span>Année</span>
+                                        </div>
+                                        <div style="text-align: center; padding: 12px; font-size: 16px; min-height: 25px; font-weight: bold;">
+                                            <span t-field="o.annee"/>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Bloc code exploitation -->
+                                <td style="width: 33%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; height: 99px; width: 180px">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 5px; font-size: 13px; font-weight: bold;">
+                                            <span>رمز الاستغلال</span>
+                                            <br/>
+                                            <span>Code d'exploitation</span>
+                                        </div>
+                                        <div style="text-align: center; padding: 12px; font-size: 16px; min-height: 25px; font-weight: bold;">
+                                            <span t-field="o.code_exploitation_cnss"/>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Espace vide -->
+                                <td style="width: 40%; padding: 0;"></td>
+                            </tr>
+                        </table>
+
+                        <!-- Section salaires et cotisations - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                                <!-- Bloc salaires déclarés -->
+                                <td style="width: 33%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000; margin-right: 5px;">
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 6px; font-size: 14px;">
+                                            <strong>
+                                                <span>الأجور المصرح بها</span>
+                                            </strong>
+                                            <br/>
+                                            <strong>
+                                                <span>Salaires déclarés</span>
+                                            </strong>
+                                        </div>
+
+                                        <div style="text-align: center; padding: 50px 15px; font-size: 18px; font-weight: bold;">
+                                            <span t-esc="'{:,.3f}'.format(total_salaires).replace(',', ' ')"/>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Bloc cotisations -->
+                                <td style="width: 67%; padding: 0; vertical-align: top;">
+                                    <div style="border: 1.5px solid #000;">
+                                        <!-- Titre des cotisations -->
+                                        <div style="text-align: center; border-bottom: 1.5px solid #000; padding: 6px; font-size: 14px;">
+                                            <strong>
+                                                <span>Cotisations</span>
+                                            </strong>
+                                            <span style="padding: 0 50px;"></span>
+                                            <strong>
+                                                <span>الاشتراكات</span>
+                                            </strong>
+                                        </div>
+
+                                        <!-- Tableau des cotisations -->
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <!-- En-tête du tableau -->
+                                            <tr>
+                                                <td style="width: 40%; border-bottom: 1.5px solid #000; border-right: 1.5px solid #000; text-align: center; padding: 6px; font-size: 14px; font-weight: bold;">
+                                                    <span>Régime</span>
+                                                    <span style="padding: 0 20px;"></span>
+                                                    <span>النظام</span>
+                                                </td>
+                                                <td style="width: 20%; border-bottom: 1.5px solid #000; border-right: 1.5px solid #000; text-align: center; padding: 6px; font-size: 14px; font-weight: bold;">
+                                                    <span>Taux</span>
+                                                    <span style="padding: 0 6px;"></span>
+                                                    <span>النسبة</span>
+                                                </td>
+                                                <td style="width: 40%; border-bottom: 1.5px solid #000; text-align: center; padding: 6px; font-size: 14px; font-weight: bold;">
+                                                    <span>Montant</span>
+                                                    <span style="padding: 0 6px;"></span>
+                                                    <span>المبلغ</span>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Ligne sécurité sociale -->
+                                            <tr>
+                                                <td style="border-right: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 10px; font-size: 13px;">
+                                                    <span>Sécurité Sociale</span>
+                                                    <span style="padding: 0 6px;"></span>
+                                                    <span>الضمان الاجتماعي</span>
+                                                </td>
+                                                <td style="border-right: 1.5px solid #000; border-bottom: 1.5px solid #000; text-align: center; padding: 10px; font-size: 13px; font-weight: bold;">
+                                                    <span>26,75</span>
+                                                </td>
+                                                <!-- Pour le total des cotisations sécurité sociale -->
+                                                <td style="border-bottom: 1.5px solid #000; text-align: right; padding: 10px; font-size: 13px; font-weight: bold;">
+                                                    <span t-esc="'{:,.3f}'.format(ss_amount).replace(',', ' ')"/>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Ligne accidents du travail -->
+                                            <tr>
+                                                <td style="border-right: 1.5px solid #000; border-bottom: 1.5px solid #000; padding: 10px; font-size: 13px;">
+                                                    <span>حوادث الشغل والأمراض المهنية</span>
+                                                    <br/>
+                                                    <span>Accidents du Travail et Maladies Professionnelles</span>
+                                                </td>
+                                                <td style="border-right: 1.5px solid #000; border-bottom: 1.5px solid #000; text-align: center; padding: 10px; font-size: 13px; font-weight: bold;">
+                                                    <span>0,5</span>
+                                                </td>
+
+                                                <!-- Pour le total des cotisations accident du travail -->
+                                                <td style="border-bottom: 1.5px solid #000; text-align: right; padding: 10px; font-size: 13px; font-weight: bold;">
+                                                    <span t-esc="'{:,.3f}'.format(at_amount).replace(',', ' ')"/>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Ligne total -->
+                                            <tr>
+                                                <td style="font-size: 13px;"></td>
+                                                <td style="border-right: 1.5px solid #000; text-align: center; padding: 12px; font-weight: bold; font-size: 14px;">
+                                                    <span>Total</span>
+                                                    <span style="padding: 0 10px;"></span>
+                                                    <span>الجملة</span>
+                                                </td>
+
+                                                <!-- Pour le total des cotisations -->
+                                                <td style="text-align: right; padding: 12px; font-weight: bold; font-size: 16px;">
+                                                    <span t-esc="'{:,.3f}'.format(total_amount).replace(',', ' ')"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section pénalités - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                            <tr>
+                                <td style="width: 10%;"></td>
+                                <td style="width: 90%; padding: 0;">
+                                    <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #000;">
+                                        <tr>
+                                            <td style="width: 30%; text-align: center; border-right: 1.5px solid #000; padding: 8px; font-size: 13px; font-weight: bold;">
+                                                <span>عدد أيام التأخير</span>
+                                                <br/>
+                                                <span>Nombre de jours de retard</span>
+                                            </td>
+                                            <td style="width: 15%; text-align: center; border-left: 1.5px solid #000; border-top: none;"></td>
+                                            <td style="width: 30%; text-align: center; padding: 8px; font-size: 13px; font-weight: bold;">
+                                                <span>مبلغ خطايا التأخير</span>
+                                                <br/>
+                                                <span>Montant des pénalités de retard</span>
+                                            </td>
+                                            <td style="width: 25%; text-align: center; border-left: 1.5px solid #000; border-top: none;"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center; height: 35px; border-top: none; border-left: 1.5px solid #000; border-right: 1.5px solid #000;"></td>
+                                            <td style="text-align: center; border-left: 1.5px solid #000; border-top: none; border-right: 1.5px solid #000;"></td>
+                                            <td style="text-align: center; border-left: 1.5px solid #000; border-top: none; border-right: 1.5px solid #000;"></td>
+                                            <td style="text-align: center; border-left: 1.5px solid #000; border-top: none; border-right: 1.5px solid #000;"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section montant à payer - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <tr>
+                                <td style="width: 45%;"></td>
+                                <td style="width: 55%; padding: 0;">
+                                    <div style="border: 2px solid #000; background-color: white; color: black;">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <tr>
+                                                <td style="width: 50%; text-align: center; padding: 10px; font-size: 16px;">
+                                                    <strong>
+                                                        <span>المبلغ المستوجب</span>
+                                                    </strong>
+                                                    <br/>
+                                                    <strong>
+                                                        <span>Montant à payer</span>
+                                                    </strong>
+                                                </td>
+
+                                                <!-- Pour le montant à payer -->
+                                                <td style="width: 50%; text-align: center; padding: 10px; font-size: 18px; font-weight: bold; border-left: 2px solid #000;">
+                                                    <span t-esc="'{:,.3f}'.format(total_amount).replace(',', ' ')"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section certification - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+                            <tr>
+                                <td style="width: 60%; font-size: 13px; vertical-align: top;">
+                                    <p>
+                                        La présente déclaration de salaires certifiée sincère et
+                                        <br/>
+                                        conforme à nos documents comptables est arrêtée à la
+                                        <br/>
+                                        somme de :
+                                    </p>
+                                    <p style="margin-top: 15px; font-style: italic; font-weight: bold; font-size: 14px;">
+                                        <t t-set="amount_text"
+                                           t-value="o.company_id.currency_id.amount_to_text(montant_final)"/>
+                                        <span t-esc="amount_text"/>
+                                    </p>
+                                </td>
+                                <td style="width: 40%; font-size: 13px; text-align: right; vertical-align: top;">
+                                    <p>
+                                        أوقف هذا التصريح بالأجور الذي
+                                        <br/>
+                                        نشهد بصدقه ومطابقته لوثائقنا المحاسبية
+                                        <br/>
+                                        : بمبلغ
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section signature - tailles réduites -->
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 40%; font-size: 13px;">
+                                    Fait à ............................................. le
+                                    .............................................
+                                </td>
+                                <td style="width: 15%;"></td>
+                                <td style="width: 40%; text-align: right; font-size: 13px;">
+                                    .................................حرر ب.................................................. في
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Section cachet - tailles réduites -->
+                        <div style="width: 100%; text-align: center; margin-top: 25px; background-color: white; color: black; padding: 6px; border-radius: 5px;">
+                            <p style="font-size: 14px; font-weight: bold;"> Signature et cachet de l'employeur          إمضاء وختم المؤجر</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

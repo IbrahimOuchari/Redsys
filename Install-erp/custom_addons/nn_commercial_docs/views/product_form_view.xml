@@ -1,0 +1,17 @@
+
+
+
+
+<odoo>
+    <record id="view_account_tax_form_inherit_timbre" model="ir.ui.view">
+        <field name="name">account.tax.form.inherit.timbre</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <field name="is_timbre"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

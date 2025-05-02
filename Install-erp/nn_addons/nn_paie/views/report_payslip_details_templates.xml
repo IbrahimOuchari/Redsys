@@ -1,0 +1,159 @@
+<odoo>
+    <!-- Format papier modifié pour tenir sur une seule page -->
+    <record id="paperformat_payslip_details_portrait" model="report.paperformat">
+        <field name="name">PaySlip Details - Portrait</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">2</field>
+        <field name="margin_left">2</field>
+        <field name="margin_right">2</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">2</field>
+        <field name="dpi">110</field>
+    </record>
+
+    <!-- Modification du rapport pour utiliser le nouveau format papier -->
+    <record id="payslip_details_report" model="ir.actions.report">
+        <field name="name">PaySlip Details PDF</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nn_paie.report_payslip_details</field>
+        <field name="report_file">nn_paie.report_payslip_details</field>
+        <field name="paperformat_id" ref="paperformat_payslip_details_portrait"/>
+        <field name="print_report_name">('Bulletin de Paie - %s' % (object.employee_id.name))</field>
+        <field name="binding_model_id" ref="model_hr_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Template du rapport details modifié avec des tailles de police augmentées -->
+    <template id="report_payslip_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="article o_report_layout_standard" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id">
+                    <!-- Header avec logo et titre -->
+                    <div class="text-center mb-3">
+                        <div style="text-align: left;">
+                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
+                             style="max-height: 100px; max-width: 300px;"/>
+                        </div>
+                        <div class="mt-3" style="border: 2px solid #000; padding: 10px;">
+                            <h2 style="margin: 0; font-size: 24px; font-weight: bold;">BULLETIN DE PAIE</h2>
+                            <h3 style="margin: 10px 0 0 0; font-size: 20px;">
+                                    DE <t t-esc="o.employee_id.name"/>
+                                    DU MOIS DE
+                                    <t t-esc="context_timestamp(datetime.datetime.combine(o.date_from, datetime.time(0, 0, 0))).strftime('%B-%Y').upper()"/>
+                                </h3>
+                        </div>
+                    </div>
+
+                    <!-- Informations principales compactes -->
+                    <table class="table table-sm table-bordered mt-3" style="font-size: 14px;">
+                        <tr>
+                            <td width="15%" style="padding: 6px 8px;"><strong>Employé:</strong></td>
+                            <td width="35%" style="padding: 6px 8px;"><span t-field="o.employee_id.name"/></td>
+                            <td width="15%" style="padding: 6px 8px;"><strong>Référence:</strong></td>
+                            <td width="35%" style="padding: 6px 8px;"><span t-field="o.number"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 8px;"><strong>Poste:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-field="o.employee_id.job_id.name"/></td>
+                            <td style="padding: 6px 8px;"><strong>Date de début:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-field="o.date_from" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 8px;"><strong>Mat. CNSS:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-field="o.employee_id.matricule_cnss"/></td>
+                            <td style="padding: 6px 8px;"><strong>Date de fin:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-field="o.date_to" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 6px 8px;"><strong>Compte bancaire:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-field="o.employee_id.compte_banque"/></td>
+                            <td style="padding: 6px 8px;"><strong>Date d'édition:</strong></td>
+                            <td style="padding: 6px 8px;"><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Section affichant toutes les lignes de salaire -->
+                    <table class="table table-sm table-bordered mt-4" style="font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #f0f0f0;">
+                                <th colspan="5" class="text-center" style="padding: 8px; font-size: 16px; font-weight: bold;">Détails des lignes de salaire</th>
+                            </tr>
+                            <tr style="background-color: #f0f0f0;">
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Code</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Rubrique</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Taux</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Base</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.line_ids.filtered(lambda l: l.total != 0)" t-as="line">
+                                <td style="padding: 5px 8px;">
+                                    <span t-field="line.code"/>
+                                </td>
+                                <td style="padding: 5px 8px;">
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-center">
+                                    <span t-field="line.rate"/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-right">
+                                    <span t-field="line.amount"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-right">
+                                    <span t-field="line.total"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Section Lignes de bulletin par registre de contribution -->
+                    <table class="table table-sm table-bordered mt-4" style="font-size: 14px;">
+                        <thead>
+                            <tr style="background-color: #f0f0f0;">
+                                <th colspan="5" class="text-center" style="padding: 8px; font-size: 16px; font-weight: bold;">Lignes de bulletin par registre de contribution</th>
+                            </tr>
+                            <tr style="background-color: #f0f0f0;">
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Code</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Rubrique</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Taux</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Base</th>
+                                <th class="text-center" style="padding: 6px; font-weight: bold;">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="[p for p in get_lines_by_contribution_register.get(o.id, []) if p.get('total', 0) != 0]" t-as="p">
+                                <td style="padding: 5px 8px;">
+                                    <span t-esc="p.get('code', '')"/>
+                                </td>
+                                <td style="padding: 5px 8px;">
+                                    <span t-esc="p.get('name', '')"/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-center">
+                                    <span t-esc="p.get('quantity', '')"/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-right">
+                                    <span t-esc="p.get('amount', 0)"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                                <td style="padding: 5px 8px;" class="text-right">
+                                    <span t-esc="p.get('total', 0)"
+                                          t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

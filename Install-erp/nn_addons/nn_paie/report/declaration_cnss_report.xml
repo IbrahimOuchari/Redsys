@@ -1,0 +1,334 @@
+<odoo>
+    <data>
+
+        <!-- Le format papier et la définition d'action restent inchangés -->
+        <record id="paperformat_cnss_landscape" model="report.paperformat">
+            <field name="name">CNSS Paysage</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">3</field>
+            <field name="margin_bottom">3</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">0</field>
+            <field name="dpi">110</field>
+        </record>
+
+        <!-- Report action definition - inchangé -->
+        <record id="action_report_declaration_cnss" model="ir.actions.report">
+            <field name="name">CNSS Declaration</field>
+            <field name="model">declaration.cnss</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nn_paie.report_declaration_cnss</field>
+            <field name="report_file">nn_paie.report_declaration_cnss</field>
+            <field name="binding_model_id" ref="model_declaration_cnss"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="nn_paie.paperformat_cnss_landscape"/>
+            <field name="print_report_name">'Déclaration CNSS - %s %s' % (object.trimestre, object.annee)</field>
+        </record>
+
+        <!-- Template pour une seule page -->
+        <template id="cnss_page_template">
+
+            <div class="page"
+                 style="font-family: Times New Roman, serif; page-break-before: always;  width: 100%; height: 100%; padding: 2px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <!-- Partie gauche de l'en-tête -->
+                        <td style="width: 30%; text-align: left; vertical-align: top; font-size: 10px; line-height: 1.2;margin-top:-100px;">
+                            <p style="margin: 0; font-weight: bold;">REPUBLIQUE TUNISIENNE</p>
+                            <p style="margin: 0; font-weight: bold;">MINISTERE DES AFFAIRES SOCIALES</p>
+                            <p style="margin: 0; font-weight: bold;">CAISSE NATIONALE DE SECURITE SOCIALE</p>
+                            <p style="margin: 0; font-size: 9px;">49.Av.TAIEB MHIRI - TUNIS- Tel :71.796.744</p>
+                        </td>
+
+                        <!-- Partie centrale - titre -->
+                        <td style="width: 60%; text-align: center; vertical-align: top;margin-top:0px;">
+                            <p style="font-size: 20px; font-weight: bold; margin-bottom: 0;">DECLARATION TRIMESTRIELLE
+                                DES SALARIES ET DES SALAIRES
+                            </p>
+                            <p style="font-size: 11px; margin-top: 0;">doit être remise à la Caisse sous peine de
+                                pénalités dans les 15 premiers jours qui suivent le trimestre
+                            </p>
+                        </td>
+
+                        <!-- Partie droite de l'en-tête -->
+                        <td style="width: 30%; text-align: right; vertical-align: top; font-size: 13px; font-weight: bold;">
+                            <p></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Section d'information employeur - inchangé -->
+                <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
+                    <tr>
+                        <td style="width: 23%; vertical-align: top;">
+                            <table style="width: 100%; border-collapse: collapse; height: 100%;">
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 25px;"
+                                        colspan="2">
+                                        <strong>N° Employeur :</strong>
+                                        <span t-field="o.company_id.mat_cnss"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 25px; width: 50%;">
+                                        <strong>BR :</strong>
+                                        <span t-field="o.company_id.bureau"/>
+                                    </td>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 25px; width: 50%;">
+                                        <strong>Trimestre :</strong>
+                                        <br/>
+                                        <span t-esc="o.trimestre[1]"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 25px; width: 50%;">
+                                        <strong>Page N° :</strong>
+                                        <span t-esc="page_index + 1"/>
+                                        /
+                                        <span t-esc="num_pages"/>
+                                    </td>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 25px; width: 50%;">
+                                        <strong>Année :</strong>
+                                        <br/>
+                                        <span t-field="o.annee"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 18%; vertical-align: top;">
+                            <table style="width: 100%; border-collapse: collapse; height: 100%;">
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 50px;">
+                                        <strong>Code d'exploitation</strong>
+                                        <br/>
+                                        <span t-field="o.code_exploitation_cnss"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 50px;">
+                                        <strong>Matricule fiscal</strong>
+                                        <br/>
+                                        <span t-field="o.company_id.vat"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="width: 5%; vertical-align: top;">
+                            <table style="width: 100%; border-collapse: collapse; height: 100%;">
+                                <tr></tr>
+                            </table>
+                        </td>
+                        <td style="width: 70%; vertical-align: top;margin-top:-40px;">
+                            <table style="width: 100%; border-collapse: collapse; height: 100%;">
+                                <tr>
+                                    <p style="margin: 10px 0 0 0; text-align: centre">NOM ET ADRESSE DE L'EMPLOYEUR</p>
+                                    <td style="border: 1px solid black; padding: 3px; font-size: 10px; height: 75px; vertical-align: top;">
+                                        <span t-field="o.company_id.name"/>
+                                        <br/>
+                                        <span t-field="o.company_id.street"/>
+                                        <br/>
+                                        <span t-if="o.company_id.street2" t-field="o.company_id.street2"/>
+                                        <br t-if="o.company_id.street2"/>
+                                        <span t-field="o.company_id.zip"/>
+                                        <span t-field="o.company_id.city"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                    <thead>
+                        <tr>
+                            <th rowspan="2"
+                                style="width: 3%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                N°<br/>Ordre
+                            </th>
+                            <th rowspan="2"
+                                style="width: 12%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                MATRICULE DE<br/>L'ASSURE
+                            </th>
+                            <th rowspan="2"
+                                style="width: 22%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                IDENTITE DU SALARIE (1)
+                            </th>
+                            <th rowspan="2"
+                                style="width: 4%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                N°<br/>chez<br/>l'Emp
+                            </th>
+                            <th rowspan="2"
+                                style="width: 6%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                Categ<br/>Prof.
+                            </th>
+                            <th colspan="3"
+                                style="border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                REMUNERATION MENSUELLE
+                                <br/>
+                                <span style="font-size: 12px; float: right;">Reports des Montants</span>
+                            </th>
+                            <th rowspan="2"
+                                style="width: 11%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                TOTAL GENERAL
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="width: 9%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                1<sup>er</sup> mois
+                            </th>
+                            <th style="width: 9%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                2<sup>ème</sup> mois
+                            </th>
+                            <th style="width: 9%; border: 1px solid black; text-align: center; padding: 3px; font-size: 13px;">
+                                3<sup>ème</sup> mois
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Lignes de données, exactement 12 par page -->
+                        <t t-foreach="range(1, 13)" t-as="i">
+                            <tr>
+                                <td style="border: 1px solid black; text-align: center; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-set="employee_index" t-value="start_index + i - 1"/>
+                                    <!-- Numérotation qui recommence à 1 sur chaque page -->
+                                    <span t-esc="i"/>
+                                </td>
+                                <td style="border: 1px solid black; text-align: center; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].matricule"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].employe_id.name"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; text-align: center; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].numer_chez_employe"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; text-align: center; padding: 4px; height: 40px;"></td>
+                                <td style="border: 1px solid black; text-align: right; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].brut_m_month1"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; text-align: right; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].brut_m_month2"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; text-align: right; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].brut_m_month3"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                                    </t>
+                                </td>
+                                <td style="border: 1px solid black; text-align: right; padding: 4px; height: 40px; font-size: 14px; font-weight: 500;">
+                                    <t t-if="employee_index &lt; len(o.declaration_cnss_line_ids)">
+                                        <span t-field="o.declaration_cnss_line_ids[employee_index].total"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <!-- Calcul du total pour la page et total global -->
+                <t t-set="total_amount" t-value="sum(line.total for line in o.declaration_cnss_line_ids)"/>
+
+                <!-- Pied de page - inchangé -->
+                <table style="width: 100%; margin-top: 10px; font-size: 10px; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 70%; vertical-align: top;">
+                            <p>Certifié sincère et conforme à nos documents comptables et arrêté à la somme de : (en
+                                toutes lettres) (2)
+                            </p>
+                            <p style="margin-top: 0;">
+                                <!-- Afficher le montant en lettres uniquement sur la dernière page -->
+                                <t t-if="is_last_page">
+                                    <span t-esc="o.amount_to_text(total_amount)"/>
+                                    dinars
+                                </t>
+                            </p>
+
+                            <p style="margin-top: 5px; font-size: 9px;">
+                                (1) l'identité doit être conforme à la carte d'assuré ou à l'extrait de naissance.
+                                <br/>
+                                (2) L'arrêté doit correspondre au total des salaires déclarés pendant le trimestre (à
+                                indiquer sur la dernière page).
+                            </p>
+                        </td>
+                        <td style="width: 30%; vertical-align: top; text-align: right;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="text-align: right; padding-right: 8px; font-size: 14px; font-weight: 500;">
+                                        Total à reporter
+                                    </td>
+                                    <td style="border: 1px solid black; width: 120px; height: 30px; text-align: right; padding-right: 8px; font-size: 15px; font-weight: bold;">
+                                        <!-- Affiche le total uniquement sur la dernière page -->
+                                        <t t-if="is_last_page">
+                                            <span t-esc="total_amount"
+                                                  t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top: 25px; font-size: 14px;">Fait à ...................... le
+                                .......................... 20........
+                            </p>
+
+                            <p style="margin-top: 18px; font-size: 14px; font-weight: 500;">
+                                Cachet et signature de l'Entreprise
+                                <br/>
+                                <span style="font-size: 10px;">(sur toutes les pages)</span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </template>
+
+        <!-- Main report template - inchangé -->
+        <template id="report_declaration_cnss">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <head>
+                        <meta charset="UTF-8"/>
+                    </head>
+
+                    <t t-foreach="docs" t-as="o">
+                        <!-- Calculer le nombre de pages nécessaires -->
+                        <t t-set="num_employees" t-value="len(o.declaration_cnss_line_ids)"/>
+                        <t t-set="num_pages"
+                           t-value="(num_employees + 11) // 12"/> <!-- Division entière arrondie au supérieur -->
+                        <t t-set="num_pages" t-value="max(1, num_pages)"/> <!-- Au moins une page -->
+
+                        <!-- Créer un document distinct pour chaque page -->
+                        <t t-foreach="range(num_pages)" t-as="page_index">
+                            <t t-set="start_index" t-value="page_index * 12"/>
+                            <t t-set="end_index" t-value="min(start_index + 12, num_employees)"/>
+                            <t t-set="is_last_page" t-value="page_index == num_pages - 1"/>
+
+                            <!-- Utiliser un template distinct pour chaque page pour forcer le saut de page -->
+                            <t t-call="nn_paie.cnss_page_template"/>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
+

@@ -1,0 +1,82 @@
+<!--<odoo>-->
+
+<!--    <record id="view_hr_payslip_by_employees" model="ir.ui.view">-->
+<!--        <field name="name">hr_payroll_payslip_employees</field>-->
+<!--        <field name="model">hr.payslip.employees</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form string="Generate Payslips">-->
+<!--                <sheet>-->
+<!--                    <header>-->
+<!--                        <button name="compute_sheet" string="Generate" type="object" class="oe_highlight" icon="fa-cogs"/>-->
+<!--                        <button string="Discard" special="cancel" class="btn-secondary"/>-->
+<!--                    </header>-->
+<!--                    <group>-->
+<!--                        <p colspan="4" nolabel="1">This wizard will generate payslips for all selected employee(s) based on the dates and credit note specified on Payslips Run.</p>-->
+<!--                    </group>-->
+<!--                    <field name="employee_ids" options="{'no_create': True}">-->
+<!--                        <tree>-->
+<!--                            <field name="name"/>-->
+<!--                            <field name="job_id"/>-->
+<!--                            <field name="department_id"/>-->
+<!--                        </tree>-->
+<!--                    </field>-->
+<!--                </sheet>-->
+<!--                <footer>-->
+<!--                    <button name="compute_sheet" string="Generate" type="object" class="btn-primary"/>-->
+<!--                    <button string="Cancel" class="btn-secondary" special="cancel"/>-->
+<!--                </footer>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--    <record id="action_hr_payslip_by_employees" model="ir.actions.act_window">-->
+<!--        <field name="name">Generate Payslips</field>-->
+<!--        <field name="res_model">hr.payslip.employees</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="view_id" ref="view_hr_payslip_by_employees"/>-->
+<!--        <field name="target">new</field>-->
+<!--        <field name="binding_model_id" ref="model_hr_payslip_run"/>-->
+<!--        <field name="binding_view_types">form</field>-->
+<!--    </record>-->
+
+<!--</odoo>-->
+<odoo>
+    <record id="view_hr_payslip_by_employees" model="ir.ui.view">
+        <field name="name">hr_payroll_payslip_employees</field>
+        <field name="model">hr.payslip.employees</field>
+        <field name="arch" type="xml">
+            <form string="Generate Payslips" js_class="hr_payslip_employees_form">
+                <sheet>
+                    <header>
+<!--                        <button name="compute_sheet" string="Generate" type="object" class="oe_highlight" icon="fa-cogs"/>-->
+<!--                        <button string="Discard" special="cancel" class="btn-secondary"/>-->
+                    </header>
+                    <group>
+                        <p colspan="4" nolabel="1">This wizard will generate payslips for all selected employee(s) based on the dates and credit note specified on Payslips Run.</p>
+                    </group>
+                    <field name="employee_ids" options="{'no_create': True}">
+                        <tree>
+                            <field name="name"/>
+                            <field name="job_id"/>
+                            <field name="department_id"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="compute_sheet" string="Generate" type="object" class="btn-primary generate_button"/>
+                    <button string="Cancel" class="btn-secondary cancel_button" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payslip_by_employees" model="ir.actions.act_window">
+        <field name="name">Generate Payslips</field>
+        <field name="res_model">hr.payslip.employees</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hr_payslip_by_employees"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_hr_payslip_run"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

@@ -1,0 +1,7 @@
+<odoo>
+    <template id="custom_report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
+    <xpath expr="//div[@id='informations']/div[@name='informations_date']" position="replace"/>
+</template>
+
+
+</odoo>

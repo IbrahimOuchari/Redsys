@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="paperformat_ordre_virement_portrait_specific" model="report.paperformat">
+        <field name="name">Certificat de Retenue d'Impôt - Portrait</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_etat_annuelle_employee_specific" model="ir.actions.report">
+        <field name="name">Certificat de Retenue d'Impôt Specifique PDF</field>
+        <field name="model">etat.annuelle.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">nn_paie.report_etat_annuelle_employee_template_specific</field>
+        <field name="report_file">nn_paie.report_etat_annuelle_employee_template_specific</field>
+        <field name="paperformat_id" ref="paperformat_ordre_virement_portrait_specific"/>
+        <field name="print_report_name">'Certificat de Retenue d\'Impôt - %s' % (object.annee)</field>
+        <field name="binding_model_id" ref="model_etat_annuelle_employee"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Template pour une seule page de certificat spécifique -->
+    <template id="certificat_retenue_page_template_specific">
+        <div class="page" style="page-break-after: always; font-family: Arial, sans-serif; padding: 20px;">
+            <!-- Header fixe -->
+            <div style="text-align: left; margin-bottom: 35px; line-height: 1.4;">
+                <p style="margin: 0; font-weight: normal; font-size: 13px;">REPUBLIQUE TUNISIENNE</p>
+                <p style="margin: 0; font-weight: normal; font-size: 13px;">MINISTERE DES FINANCES</p>
+                <p style="margin: 0; font-weight: normal; font-size: 13px;">DIRECTION GENERALE</p>
+                <p style="margin: 0; font-weight: normal; font-size: 13px;">DU CONTROLE FISCAL</p>
+            </div>
+
+            <!-- Title -->
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="border: 1.5px solid black; display: inline-block; padding: 12px 35px;">
+                    <p style="margin: 0; font-weight: bold; font-size: 16px;">CERTIFICAT DE RETENUE</p>
+                    <p style="margin: 0; font-weight: bold; font-size: 16px;">D'IMPOT SUR LE REVENUE</p>
+                </div>
+            </div>
+
+            <div style="text-align: right; margin-bottom: 25px;">
+                <span style="font-size: 13px;">Retenue Effectuée durant l'année</span>
+                <span t-field="o.annee"
+                      style="border: 1.5px solid black; display: inline-block; padding: 6px 22px; font-size: 13px; margin-left: 8px;"/>
+            </div>
+
+            <!-- Section A -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 0; border: 1.5px solid black;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0; margin-bottom: 12px; font-weight: bold; font-size: 14px;">A - Employeur ou
+                            organisme
+                            payeur
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 250px; padding: 7px 0; font-size: 13px;">Nom, prénoms ou raison
+                                    sociale
+                                </td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <span t-field="o.company_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; font-size: 13px;">Adresse</td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <span t-field="o.company_id.street"/>
+                                    <span t-field="o.company_id.street2"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; font-size: 13px;">Matricule Fiscal :</td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <span t-field="o.company_id.vat"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="width: 100%; border-collapse: collapse; border: 1.5px solid black; border-top: none;">
+                <tr>
+                    <td style="padding: 20px; position: relative;">
+                        <p style="margin: 0; margin-bottom: 12px; font-weight: bold; font-size: 14px;">B - Désignation
+                            du bénéficiaire
+                        </p>
+
+                        <!-- Section situation familiale et nombre d'enfants en haut à droite -->
+                        <div style="position: absolute; top: 10px; right: 20px;">
+                            <table style="border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 4px 8px; font-size: 13px; font-weight: bold;">S.F.:</td>
+                                    <td style="padding: 4px 8px; font-size: 13px; font-weight: bold;">NB. ENF.:</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1.5px solid black; width: 40px; height: 35px; text-align: center; font-size: 13px;">
+                                        <t t-if="line.employe_id.marital == 'single'">C</t>
+                                        <t t-elif="line.employe_id.marital == 'married'">M</t>
+                                        <t t-elif="line.employe_id.marital == 'cohabitant'">C.L</t>
+                                        <t t-elif="line.employe_id.marital == 'widower'">V</t>
+                                        <t t-elif="line.employe_id.marital == 'divorced'">D</t>
+                                    </td>
+                                    <td style="border: 1.5px solid black; width: 40px; height: 35px; text-align: center; font-size: 13px;">
+                                        <span t-field="line.employe_id.children"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="border-collapse: collapse; border: 1.5px solid black;">
+                    <td>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="width: 200px; padding: 7px 0; font-size: 13px;">Noms et prénoms</td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <span t-field="line.employe_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; font-size: 13px;">Adresse</td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <!--                                    <span t-field="line.employe_id.address_home_id.street"/>-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 7px 0; font-size: 13px;">Emploi occupé</td>
+                                <td style="padding: 7px 0; font-size: 13px;">
+                                    <span t-field="line.employe_id.job_id.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding: 7px 0;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <tr>
+                                            <td style="width: 50%; padding: 7px 0; font-size: 13px;">C.I.N :
+                                                <span t-field="line.employe_id.num_cin"/>
+                                            </td>
+                                            <td style="width: 50%; padding: 7px 0; font-size: 13px;">C.N.S.S :
+                                                <span t-field="line.employe_id.matricule_cnss"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding: 15px 0 7px 0; font-size: 13px;">Période de travail
+                                    durant l'année : 12 / 12
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Financial Data Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+                <tr>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        Revenu Imposable
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        Valeur des Avantages en nature
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        Total des revenus brut Imposable
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        Revenu Réinvesti
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        IRPP
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        C.S.S
+                    </th>
+                    <th style="border: 1.5px solid black; padding: 10px; text-align: center; font-size: 13px; font-weight: bold;">
+                        Revenu net
+                    </th>
+                </tr>
+                <tr>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">
+                        <span t-field="line.salaire_imposable"
+                              t-options='{"widget": "float", "precision": 3}'/>
+                    </td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">0,000</td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">
+                        <span t-field="line.salaire_imposable"
+                              t-options='{"widget": "float", "precision": 3}'/>
+                    </td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">0,000</td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">
+                        <span t-field="line.impot" t-options='{"widget": "float", "precision": 3}'/>
+                    </td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">
+                        <span t-field="line.css" t-options='{"widget": "float", "precision": 3}'/>
+                    </td>
+                    <td style="border: 1.5px solid black; padding: 12px; text-align: right; font-size: 13px;">
+                        <span t-field="line.impot_du" t-options='{"widget": "float", "precision": 3}'/>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Certification Text -->
+            <div style="text-align: center; margin-top: 35px; font-size: 13px;">
+                <p style="margin: 0;">Je soussigné, certifie exacts et sincères les renseignements figurant sur le
+                    présent
+                    certificat et
+                </p>
+                <p style="margin: 0;">m'expose aux sanctions prévues par la loi pour toutes inexactitude.</p>
+
+                <div style="margin-top: 45px;">
+                    <p style="margin: 0;">A . . . . . . . . , le . . . . . . . . . . . .</p>
+                    <p style="margin-top: 35px;">Cachet et signature de l'employeur</p>
+                    <p style="margin: 0;">ou du débirentier</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Main report template -->
+    <template id="report_etat_annuelle_employee_template_specific">
+        <t t-call="web.html_container">
+            <head>
+                <meta charset="UTF-8"/>
+            </head>
+            <t t-foreach="docs" t-as="o">
+                <!-- Pour chaque employé dans les lignes avec condition selected -->
+                <t t-foreach="o.annual_employee_line_ids" t-as="line" t-if="line.selected">
+                    <!-- Utiliser le template pour un certificat spécifique -->
+                    <t t-call="nn_paie.certificat_retenue_page_template_specific"/>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

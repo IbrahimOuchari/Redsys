@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vue formulaire pour le wizard -->
+    <record id="view_employee_certificate_wizard_form" model="ir.ui.view">
+        <field name="name">employee.certificate.wizard.form</field>
+        <field name="model">employee.certificate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sélection des employés pour le certificat">
+                <group>
+                    <field name="etat_annuelle_id"/>
+                    <field name="employee_line_ids"
+                           domain="[('etat_annuelle_employee_id', '=', etat_annuelle_id)]"
+                           widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="print_selected_certificates" string="Imprimer" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action pour le wizard -->
+    <record id="action_employee_certificate_wizard" model="ir.actions.act_window">
+        <field name="name">Imprimer Certificats de Retenue</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">employee.certificate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+<!--    &lt;!&ndash; Héritage de la vue form de etat.annuelle.employee &ndash;&gt;-->
+<!--    <record id="view_etat_annuelle_employee_form_inherit" model="ir.ui.view">-->
+<!--        <field name="name">etat.annuelle.employee.form.inherit</field>-->
+<!--        <field name="model">etat.annuelle.employee</field>-->
+<!--        <field name="inherit_id" ref="nn_paie.view_etat_annuelle_employee_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <header position="inside">-->
+
+<!--            </header>-->
+<!--        </field>-->
+<!--    </record>-->
+</odoo>

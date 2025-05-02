@@ -1,0 +1,214 @@
+
+<odoo>
+    <data>
+        <record id="paperformat_payslip_batch_compact" model="report.paperformat">
+            <field name="name">Lots de bulletins de paie - Compact</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">12</field>
+            <field name="margin_bottom">25</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">30</field>
+            <field name="dpi">100</field>
+        </record>
+
+        <!-- Le record du rapport reste inchangé -->
+        <record id="report_lots_de_bulletins_action" model="ir.actions.report">
+            <field name="name">Lots de bulletins de paie PDF</field>
+            <field name="model">hr.payslip.run</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">nn_paie.report_lots_de_bulletins</field>
+            <field name="report_file">nn_paie.report_lots_de_bulletins</field>
+            <field name="paperformat_id" ref="paperformat_payslip_batch_compact"/>
+            <field name="print_report_name">'Lots de bulletins de paie - %s' % (object.name)</field>
+            <field name="binding_model_id" ref="model_hr_payslip_run"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_lots_de_bulletins">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-foreach="docs" t-as="batch">
+                        <t t-foreach="batch.slip_ids" t-as="o">
+                            <div class="page" style="page-break-after: always; font-size: 12px;">
+                                <!-- Header avec logo et titre -->
+                                <div class="text-center mb-3">
+                                    <div style="text-align: left;">
+                                    <img t-if="batch.company_id.logo" t-att-src="image_data_uri(batch.company_id.logo)"
+                                         style="max-height: 70px; max-width: 250px;"/>
+                                    </div>
+                                    <div class="mt-3" style="border: 2px solid #000; padding: 6px;">
+                                        <h2 style="margin: 0; font-weight: bold; font-size: 18px;">BULLETIN DE PAIE</h2>
+                                        <h3 style="margin: 3px 0 0 0; font-size: 15px;">
+                                            DE <t t-esc="o.employee_id.name"/>
+                                            DU MOIS DE
+                                            <t t-if="batch.name" t-esc="batch.name"/>
+                                            <t t-else="">
+                                                <t t-esc="context_timestamp(datetime.datetime.strptime(o.date_from, '%Y-%m-%d')).strftime('%B-%Y')"/>
+                                            </t>
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                <!-- Informations de l'entête -->
+                                <p class="mt-3 mb-1" style="font-size: 14px; font-weight: bold;">
+                                    <t t-esc="batch.company_id.name"/>
+                                </p>
+
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <p class="mb-1" style="font-size: 12px;">
+                                            <strong>Date de début :</strong>
+                                            <t t-esc="o.date_from"/>
+                                        </p>
+                                        <p class="mb-1" style="font-size: 12px;">
+                                            <strong>Date de fin :</strong>
+                                            <t t-esc="o.date_to"/>
+                                        </p>
+                                        <p class="mb-1" style="font-size: 12px;">
+                                            <strong>Date d'édition :</strong>
+                                            <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
+                                        </p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1" style="font-size: 12px;">
+                                            <strong>Matricule CNSS :</strong>
+                                            <t t-esc="batch.company_id.mat_cnss"/>
+                                        </p>
+                                        <p class="mb-1" style="font-size: 12px;">
+                                            <strong>Référence :</strong>
+                                            Fiche de Paie -
+                                            <t t-esc="o.number"/>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Informations employé -->
+                                <div class="mt-3 mb-3" style="border: 1.5px solid #aaa; padding: 8px; background-color: #f9f9f9;">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <strong>Nom :</strong>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <strong>Poste :</strong>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <strong>Matricule CNSS :</strong>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <strong>Compte bancaire :</strong>
+                                            </p>
+                                        </div>
+                                        <div class="col-9">
+                                            <p class="mb-1" style="font-size: 12px; font-weight: bold;">
+                                                <t t-esc="o.employee_id.name"/>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <t t-esc="o.employee_id.job_id.name"/>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <t t-esc="o.employee_id.matricule_cnss"/>
+                                            </p>
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <t t-esc="o.employee_id.compte_banque"/>
+                                            </p>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <p class="mb-1" style="font-size: 12px;">
+                                                <strong>Statut Employé:</strong>
+                                                <t t-esc="o.employee_id.statut_employee"/>
+                                            </p>
+                                            <p class="mb-1" t-if="o.employee_id.chef_famille" style="font-size: 12px;">
+                                                <strong>Situation Familiale:</strong>
+                                                <t t-if="o.employee_id.marital == 'single'">Célibataire</t>
+                                                <t t-elif="o.employee_id.marital == 'married'">Marié(e)</t>
+                                                <t t-elif="o.employee_id.marital == 'cohabitant'">Concubinage</t>
+                                                <t t-elif="o.employee_id.marital == 'widower'">Veuf(ve)</t>
+                                                <t t-elif="o.employee_id.marital == 'divorced'">Divorcé(e)</t>
+                                                <strong style="margin-left: 15px;">Nombre d'enfants:</strong>
+                                                <t t-esc="o.employee_id.children"/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tableau des rubriques de paie -->
+                                <table class="table table-sm table-bordered mt-3 mb-3" style="font-size: 12px;">
+                                    <thead>
+                                        <tr style="background-color: #f2f2f2;">
+                                            <th class="text-center py-1" style="width: 40%;">Rubriques</th>
+                                            <th class="text-center py-1" style="width: 15%;">Taux</th>
+                                            <th class="text-center py-1" style="width: 20%;">Base</th>
+                                            <th class="text-center py-1" style="width: 25%;">Montant</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip and
+                                                              line.name not in ['Intérêt premier logement', 'Epargne Assurance Vie'] and
+                                                              not (line.total == 0 and line.name in ['Prime de Panier', 'Prime Responsabilité', 'Prime PDG', 'Autre Prime']))"
+                                           t-as="line">
+                                            <tr>
+                                                <td class="py-1">
+                                                    <t t-esc="line.name"/>
+                                                </td>
+                                                <td class="text-center py-1">
+                                                    <t t-esc="line.quantity"/>
+                                                </td>
+                                                <td class="text-right py-1">
+                                                    <t t-esc="line.amount"
+                                                       t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                </td>
+                                                <td class="text-right py-1">
+                                                    <t t-esc="line.total"
+                                                       t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <!-- Totaux -->
+                                <div class="mt-3">
+                                    <table class="table table-sm mb-2">
+                                        <tr>
+                                            <td class="text-right" colspan="3">
+                                                <strong style="font-size: 15px;">NET À PAYER :</strong>
+                                            </td>
+                                            <td class="text-right border-top border-bottom" style="border-width: 2px !important;">
+                                                <strong style="font-size: 15px;">
+                                                    <t t-esc="o.line_ids.filtered(lambda l: l.code == 'NET').total"
+                                                       t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- Section signature -->
+                                    <div class="row mt-4" style="font-size: 12px;">
+                                        <div class="col-6 text-center">
+                                            <p class="mb-2" style="font-weight: bold;">L'employeur</p>
+                                            <p class="mt-4 mb-0">Signature et Cachet</p>
+                                            <img t-if="o.company_id.signature_responsable_paie"
+                                                 t-att-src="'/web/image/res.company/%s/signature_responsable_paie' % o.company_id.id"
+                                                 style="max-height: 85px;"/>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <p class="mb-2" style="font-weight: bold;">L'employé</p>
+                                            <p class="mt-4 mb-0">Signature</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

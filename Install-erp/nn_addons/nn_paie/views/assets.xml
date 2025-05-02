@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8"?> <odoo> <template id="assets_backend" name="nn_paie assets" inherit_id="web.assets_backend"> <xpath expr="." position="inside"> <script type="module" src="/nn_paie/static/src/js/hr_payslip_employees_form.js"/> </xpath> </template> </odoo>

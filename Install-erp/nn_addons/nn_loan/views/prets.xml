@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_employee_loan_tree" model="ir.ui.view">
+        <field name="name">employee.loan.tree</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <tree string="Prêts employés" decoration-info="state == 'draft'" decoration-muted="state == 'cancel'"
+                  decoration-danger="state == 'reject'" decoration-success="state == 'approve'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="date_demande"/>
+                <field name="date_debut"/>
+                <field name="montant_pret"/>
+                <field name="mensualite"/>
+                <field name="duree_mois"/>
+                <field name="department"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_employee_loan_form" model="ir.ui.view">
+        <field name="name">employee.loan.form</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <form string="Prêt employé">
+                <header>
+                    <button name="submit_to_manager" type="object" string="Soumettre"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="approve_request" type="object" string="Approuver"
+                            class="oe_highlight" invisible="state != 'submit'"
+                            groups="hr.group_hr_user"/>
+                    <button name="approve_request_acc_dept" type="object" string="Approuver (Comptabilité)"
+                            class="oe_highlight" invisible="state != 'waiting_approval'"
+                            groups="account.group_account_manager"/>
+                    <button name="reject" type="object" string="Rejeter"
+                            invisible="state != 'submit' and state != 'waiting_approval'"/>
+                    <button name="cancel" type="object" string="Annuler"
+                            invisible="state != 'draft' and state != 'submit' and state != 'waiting_approval'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submit,waiting_approval,approve"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="department"/>
+                            <field name="employee_contract_id" readonly="1"/>
+                            <field name="date_demande" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="date_debut" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="duree_mois" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                        <group>
+                            <field name="montant_pret" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="mensualite"/>
+                            <field name="reste_a_payer"/>
+                            <field name="taux_interet" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="payment_method" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="currency_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Informations générales">
+                            <group>
+                                <field name="reason" modifier="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </group>
+                            <group>
+                                <field name="piece_justificative" filename="piece_justificative_name"/>
+                                <field name="piece_justificative_name" invisible="1"/>
+                            </group>
+                        </page>
+                        <page string="Échéancier">
+                            <field name="echeancier_ids" readonly="1">
+                                <tree>
+                                    <field name="sequence"/>
+                                    <field name="date_echeance"/>
+                                    <field name="montant"/>
+                                    <field name="state"/>
+                                    <field name="date_payment"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_employee_loan_search" model="ir.ui.view">
+        <field name="name">employee.loan.search</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher les prêts">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department"/>
+                <filter string="Mes prêts" name="my_loans" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="Brouillon" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="En attente" name="waiting" domain="[('state', 'in', ('submit', 'waiting_approval'))]"/>
+                <filter string="Approuvé" name="approved" domain="[('state', '=', 'approve')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Employé" name="employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Département" name="department" context="{'group_by': 'department'}"/>
+                    <filter string="État" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Date de demande" name="date_demande" context="{'group_by': 'date_demande'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_employee_loan" model="ir.actions.act_window">
+        <field name="name">Prêts employés</field>
+        <field name="res_model">employee.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_employee_loan_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer votre première demande de prêt
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="menu_employee_loan_root"
+              name="Prêts employés"
+              parent="hr.menu_hr_root"
+              sequence="100"/>
+
+    <menuitem id="menu_employee_loan"
+              name="Prêts"
+              parent="menu_employee_loan_root"
+              action="action_employee_loan"
+              sequence="1"/>
+
+    <!-- Séquence pour le numéro de prêt -->
+    <record id="seq_employee_loan" model="ir.sequence">
+        <field name="name">Séquence de prêt employé</field>
+        <field name="code">employee.loan.seq</field>
+        <field name="prefix">PRET/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

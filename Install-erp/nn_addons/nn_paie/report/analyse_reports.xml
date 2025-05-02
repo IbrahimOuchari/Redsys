@@ -1,0 +1,74 @@
+<odoo>
+    <record id="report_journal_paie_action_xlsx" model="ir.actions.report">
+        <field name="name">Export XLSX Journal de Paie</field>
+        <field name="model">journal.paie</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">nn_paie.journal_paie_xls</field>
+        <field name="report_file">nn_paie.journal_paie_xls</field>
+<!--        <field name="paperformat_id" ref="paperformat_journal_paie_landscape"/>-->
+        <field name="print_report_name">'Journal de Paie - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_journal_paie"/>
+        <field name="binding_type">report</field>
+    </record>
+    <report
+            id="action_report_bmg_paie_xlsx"
+            model="journal.paie"
+            string="Export XLSX Journal Paie"
+            report_type="xlsx"
+            name="nn_paie.journal_paie_xls"
+            file="nn_paie.journal_paie_xls"
+    />
+
+
+    <record id="report_ordre_virement_action_xlsx" model="ir.actions.report">
+        <field name="name">Export XLSX Ordre de Virement</field>
+        <field name="model">ordre.virement</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">nn_paie.ordre_virement_xls</field>
+        <field name="report_file">nn_paie.ordre_virement_xls</field>
+<!--        <field name="paperformat_id" ref="paperformat_ordre_virement_portrait"/>-->
+        <field name="print_report_name">'Ordre de virement - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_ordre_virement"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <report
+            id="action_report_bmg_ordre_de_virement_xlsx"
+            model="ordre.virement"
+            string="Export XLSX Ordre Virement"
+            report_type="xlsx"
+            name="nn_paie.ordre_virement_xls"
+            file="nn_paie.ordre_virement_xls"
+    />
+    <report
+            id="action_report_bmg_ordre_virement_xlsx"
+            model="etat.avances.mensuelles"
+            string="Export XLSX État Avances Mensuelles"
+            report_type="xlsx"
+            name="nn_paie.etat_avances_mensuelles"
+            file="nn_paie.etat_avances_mensuelles"
+    />
+
+
+    <record id="report_declaration_cnss_action_xlsx" model="ir.actions.report">
+        <field name="name">Export XLSX Déclaration CNSS </field>
+        <field name="model">declaration.cnss</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">nn_paie.declaration_cnss_xls</field>
+        <field name="report_file">nn_paie.declaration_cnss_xls</field>
+<!--        <field name="paperformat_id" ref="paperformat_declaration_cnss_portrait"/>-->
+        <field name="print_report_name">'Déclaration CNSS - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_declaration_cnss"/>
+        <field name="binding_type">report</field>
+    </record>
+    <report
+            id="action_report_declaration_cnss_xlsx"
+            model="declaration.cnss"
+            string="Export XLSX Déclaration CNSS"
+            report_type="xlsx"
+            name="nn_paie.declaration_cnss_xls"
+            file="nn_paie.declaration_cnss_xls"
+    />
+
+
+</odoo>

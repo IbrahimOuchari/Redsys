@@ -1,0 +1,16 @@
+/* Style spécifique pour masquer le bouton New dans la boîte de dialogue des employés */
+.modal-dialog[data-title*="Employees"] .modal-footer button.btn-primary:not(.o_select_button),
+.modal-dialog[data-title*="Employés"] .modal-footer button.btn-primary:not(.o_select_button) {
+    display: none !important;
+}
+
+/* Version alternative avec des sélecteurs plus spécifiques */
+.modal-dialog .modal-footer button.btn-primary:not(.o_select_button):contains("New"),
+.modal-dialog .modal-footer button.btn-primary:not(.o_select_button):contains("Nouveau") {
+    display: none !important;
+}
+
+/* Solution encore plus ciblée en utilisant les attributs de position */
+.modal-dialog .modal-footer button.btn-primary:nth-child(2) {
+    display: none !important;
+}

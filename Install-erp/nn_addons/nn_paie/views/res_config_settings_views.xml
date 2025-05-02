@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Création de la séquence -->
+    <record id="seq_nn_paie_slip" model="ir.sequence">
+        <field name="name">Sequence Bulletin de Paie</field>
+        <field name="code">nn.paie.slip</field>
+        <field name="prefix">PAIE/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.hr.payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="45"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="////form" position="inside">
+                <div class="app_settings_block" data-string="Signature Responsable" string="Signature Responsable" data-key="signature_settings">
+                    <h2>Signature Responsable Paie</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Signature du Responsable Paie</span>
+                                <div class="text-muted">
+                                    Cette signature sera utilisée dans les ordres de virement et autres documents
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="signature_responsable_paie" widget="image" class="oe_avatar"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'nn_paie'}</field>
+    </record>
+
+    <menuitem id="menu_hr_payroll_global_settings"
+              name="Settings"
+              parent="menu_hr_payroll_configuration"
+              sequence="0"
+              action="action_hr_payroll_configuration"
+              groups="base.group_system"/>
+</odoo>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Search -->
+    <record id="view_search_hr_contract_type" model="ir.ui.view">
+        <field name="name">hr.contract.type.search</field>
+        <field name="model">hr.contract.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Titre"/>
+                <filter string="Archivé" name="active" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tree -->
+    <record id="view_tree_hr_contract_type" model="ir.ui.view">
+        <field name="name">hr.contract.type.view.tree</field>
+        <field name="model">hr.contract.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Type de Contrat"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="view_form_hr_contract_type" model="ir.ui.view">
+        <field name="name">hr.contract.type.view.form</field>
+        <field name="model">hr.contract.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" string="Type de Contrat"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Termes">
+                            <field name="term_ids">
+                                <tree>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Titre"/>
+                                    <field name="body" string="Contenu"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="name" string="Titre"/>
+                                        <field name="body" string="Contenu"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_view_hr_contract_type" model="ir.actions.act_window">
+        <field name="name">Types Contrat</field>
+        <field name="res_model">hr.contract.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Créer un nouvel enregistrement
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem name="Types Contrat" id="menu_view_hr_contract_type" parent="hr.menu_human_resources_configuration"
+              action="action_view_hr_contract_type" sequence="3"/>
+
+    <!-- Contrat Form (Héritage) -->
+    <record id="hr_contract_view_form" model="ir.ui.view">
+        <field name="name">hr.contract.inherited.contract_type</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+<!--            <xpath expr="//field[@name='structure_type_id']" position="after">-->
+<!--                <field name="contract_type_id" options="{'no_create': True, 'no_create_edit': True}"/>-->
+<!--            </xpath>-->
+
+            <!-- Modification des options pour les champs -->
+            <xpath expr="//field[@name='department_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='job_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='structure_type_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='hr_responsible_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Séquence pour contrat -->
+    <record id="seq_contract_ref" model="ir.sequence">
+        <field name="name">Référence Contrat</field>
+        <field name="code">contract.ref</field>
+        <field name="prefix">Contrat N°</field>
+        <field name="padding">3</field>
+    </record>
+
+</odoo>
