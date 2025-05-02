@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
+import copy
 
 from markupsafe import escape, Markup
 from werkzeug.urls import url_encode
@@ -431,63 +432,55 @@ class PurchaseRfq(models.Model):
     #         'target': 'new',
     #         'context': ctx,
     #     }
+
     def action_rfq_send(self):
-        '''
-        This function sends an email for the purchase RFQ to each supplier,
-        using the appropriate email template.
-        '''
+        """
+        Envoie un email individuel à chaque fournisseur dans suppliers_ids uniquement,
+        avec un corps de message personnalisé.
+        """
         self.ensure_one()
 
-        # Define template ID
-        template_xmlid = 'purchase.email_template_edi_purchase_rfq'
+        # Déterminer le type de document (RFQ ou commande)
+        model_description = _('Demande de prix') if self.state in ['draft', 'sent'] else _('Bon de commande')
 
-        # Safely get template ID
-        template_id = self.env.ref(template_xmlid, raise_if_not_found=False)
-        if not template_id:
-            raise ValueError(_("Email template not found: %s") % template_xmlid)
-
-        # Prepare base context for the email composition
-        base_ctx = dict(self.env.context or {})
-        base_ctx.update({
-            'default_model': 'purchase.rfq',
-            'default_res_ids': self.ids,
-            'default_template_id': template_id.id,
-            'default_composition_mode': 'comment',
-            'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
-            'force_email': True,
-            'mark_rfq_as_sent': True,
-        })
-
-        # Set the appropriate model description based on state
-        lang = self.env.context.get('lang')
-        if template_id and template_id.lang:
-            lang = template_id._render_lang([self.id])[self.id]
-
-        self = self.with_context(lang=lang)
-        if self.state in ['draft', 'sent']:
-            base_ctx['model_description'] = _('Request for Quotation')
-        else:
-            base_ctx['model_description'] = _('Purchase Order')
-
-        # Iterate over each supplier and send a separate email
+        # Envoyer l'email à chaque fournisseur dans suppliers_ids
         for supplier in self.suppliers_ids:
-            # Create a new context for each supplier
-            ctx = base_ctx.copy()
-            ctx['default_partner_ids'] = [supplier.id]
+            if not supplier.email:
+                continue  # Ignorer les fournisseurs sans email
 
-            # Render the email template with the current supplier
+            # Corps de l'email (selon ton modèle imposé)
+            email_body = _('''
+                <div>
+                    <p style="font-size: 13px;">
+                        Bonjour %(name)s %(parent)s,<br/><br/>
+                        Veuillez trouver en pièce jointe une %(doc_type)s <b>%(doc_name)s</b> %(ref)s de la société %(company)s.<br/><br/>
+                        Si vous avez des questions, n'hésitez pas à nous contacter.<br/><br/>
+                        Cordialement,<br/>
+                        %(signature)s
+                    </p>
+                </div>
+            ''') % {
+                'name': supplier.name or '',
+                'parent': f"({supplier.parent_id.name})" if supplier.parent_id else '',
+                'doc_type': model_description,
+                'doc_name': self.name or '',
+                'ref': f"(réf : {self.partner_ref})" if self.partner_ref else '',
+                'company': self.company_id.name or '',
+                'signature': self.user_id.signature or '',
+            }
+
+            # Préparer les valeurs de l’email
             email_values = {
                 'email_to': supplier.email,
                 'partner_ids': [supplier.id],
+                'subject': _('%s - Commande (Réf %s)') % (self.company_id.name, self.name or 'n/a'),
+                'body_html': email_body,
             }
 
-            # Send the email using the mail.template model
-            template_id.with_context(ctx).send_mail(self.id, force_send=True, raise_exception=True,
-                                                    email_values=email_values)
+            # Envoi de l'email sans utiliser de modèle d'email
+            self.env['mail.mail'].create(email_values).send()
 
-        return {
-            'type': 'ir.actions.act_window_close',
-        }
+        return {'type': 'ir.actions.act_window_close'}
 
     # def print_quotation(self):
     #     self.write({'state': "sent"})
