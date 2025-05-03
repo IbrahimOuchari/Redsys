@@ -1203,3 +1203,21 @@ class PurchaseOrder(models.Model):
         """
         self.ensure_one()
         return self.state == 'cancel'
+
+
+    # New fields and functions
+    dd_amount = fields.Float(string="DD Amount")
+    dd_currency_id = fields.Many2one('res.currency', string="DD Currency")
+    dd_amount_dinar = fields.Float(string="DD Amount in Dinar")
+
+    transport_amount = fields.Float(string="Transport Amount")
+    transport_currency_id = fields.Many2one('res.currency', string="Transport Currency")
+    transport_amount_dinar = fields.Float(string="Transport Amount in Dinar")
+
+    transit_amount = fields.Float(string="Transit Amount")
+    transit_currency_id = fields.Many2one('res.currency', string="Transit Currency")
+    transit_amount_dinar = fields.Float(string="Transit Amount in Dinar")
+
+    cert_amount = fields.Float(string="Cert Amount")
+    cert_currency_id = fields.Many2one('res.currency', string="Cert Currency")
+    cert_amount_dinar = fields.Float(string="Cert Amount in Dinar")

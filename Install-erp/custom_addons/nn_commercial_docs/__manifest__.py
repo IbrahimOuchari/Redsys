@@ -1,4 +1,3 @@
-
 {
     'name': 'Custom Invoice Report',
     'version': '1.0',
@@ -13,7 +12,7 @@ This module customizes the invoice reports in Odoo 17:
     """,
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
-    'depends': ['account','sale','product','base'],
+    'depends': ['account', 'sale', 'product', 'base'],
     'data': [
         'views/product_form_view.xml',
         'views/account_move_form.xml',
@@ -21,6 +20,9 @@ This module customizes the invoice reports in Odoo 17:
         'reports/sale_order_report.xml',
         'reports/custom_invoice_templates.xml',
     ],
+
+
+
     'installable': True,
     'application': False,
     'auto_install': False,

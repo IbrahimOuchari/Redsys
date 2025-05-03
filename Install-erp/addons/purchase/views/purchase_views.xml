@@ -491,6 +491,124 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="Fees">
+                            <group string="Financial Details">
+                                <group colspan="2">
+                                    <div class="mb-3">
+                                        <strong>DD</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 25px 12px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left;">Montant</th>
+                                                    <th style="text-align: center;">Devise</th>
+                                                    <th style="text-align: right;">Montant en Dinar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left;">
+                                                        <field name="dd_amount"/>
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        <field name="dd_currency_id"/>
+                                                    </td>
+                                                    <td style="text-align: right;">
+                                                        <field name="dd_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+
+                                </group>
+<group colspan="2">
+    <div class="mb-3">
+        <strong>Transport</strong>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 25px 12px;">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Montant</th>
+                    <th style="text-align: center;">Devise</th>
+                    <th style="text-align: right;">Montant en Dinar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: left;">
+                        <field name="transport_amount"/>
+                    </td>
+                    <td style="text-align: center;">
+                        <field name="transport_currency_id"/>
+                    </td>
+                    <td style="text-align: right;">
+                        <field name="transport_amount_dinar"/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</group>
+
+<group colspan="2">
+    <div class="mb-3">
+        <strong>Transit</strong>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 25px 12px;">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Montant</th>
+                    <th style="text-align: center;">Devise</th>
+                    <th style="text-align: right;">Montant en Dinar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: left;">
+                        <field name="transit_amount"/>
+                    </td>
+                    <td style="text-align: center;">
+                        <field name="transit_currency_id"/>
+                    </td>
+                    <td style="text-align: right;">
+                        <field name="transit_amount_dinar"/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</group>
+
+                                <group colspan="2">
+    <div class="mb-3">
+        <strong>Cert</strong>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 25px 12px;">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Montant</th>
+                    <th style="text-align: center;">Devise</th>
+                    <th style="text-align: right;">Montant en Dinar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: left;">
+                        <field name="cert_amount"/>
+                    </td>
+                    <td style="text-align: center;">
+                        <field name="cert_currency_id"/>
+                    </td>
+                    <td style="text-align: right;">
+                        <field name="cert_amount_dinar"/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</group>
+
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
