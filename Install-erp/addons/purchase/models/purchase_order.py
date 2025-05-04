@@ -1325,8 +1325,8 @@ class PurchaseOrder(models.Model):
                     rate = latest_rate.rate
                 self.cert_amount_dinar = self.cert_amount * rate
 
-    additional_cost_per_unit = fields.Float(
-        string="Additional Cost per Unit (Dinar)",
+    cost_by_product = fields.Float(
+        string="Cost by product",
         compute="_compute_additional_cost_by_qty",
         store=True,
     )
@@ -1338,6 +1338,9 @@ class PurchaseOrder(models.Model):
             total_qty = sum(line.product_qty for line in order.order_line)
             # Avoid division by zero
             if total_qty:
-                order.additional_cost_per_unit = order.total_amount_dinar / total_qty
+                order.cost_by_product = order.total_amount_dinar / total_qty
             else:
-                order.additional_cost_per_unit = 0.0
+                order.cost_by_product = 0.0
+
+
+    cost_line_ids = fields.One2many('purchase.order.cost.line', 'order_id', string='Cost Lines')
