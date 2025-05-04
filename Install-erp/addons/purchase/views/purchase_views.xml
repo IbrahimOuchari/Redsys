@@ -605,7 +605,36 @@
             </tbody>
         </table>
     </div>
+</group><group>
+    <!-- … your other fields … -->
+
+    <div class="mb-3">
+        <strong>Additional Cost Allocation</strong>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 20px 10px;">
+            <thead>
+                <tr>
+                    <!-- Bigger headers -->
+                    <th style="text-align: left; font-size: 1.2em;">Additional Cost</th>
+                    <th style="text-align: right; font-size: 1.2em;">Total Amount (Dinar)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- Bigger cells -->
+                    <td style="text-align: left; font-size: 1.1em;">
+                        <field name="additional_cost_per_unit"/>
+                    </td>
+                    <td style="text-align: right; font-size: 1.1em;">
+                        <field name="total_amount_dinar"/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- … rest of your form … -->
 </group>
+
 
                             </group>
                         </page>

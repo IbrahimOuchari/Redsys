@@ -1226,6 +1226,18 @@ class PurchaseOrder(models.Model):
     cert_currency_id = fields.Many2one('res.currency', string="Cert Currency")
     cert_amount_dinar = fields.Float(string="Cert Amount in Dinar")
 
+
+    # Total Amount of Amount dinars
+    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_total_amount_dinar", store=True)
+    @api.onchange('dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
+    def _compute_total_amount_dinar(self):
+        for record in self:
+            record.total_amount_dinar = sum([
+                record.dd_amount_dinar or 0.0,
+                record.transport_amount_dinar or 0.0,
+                record.transit_amount_dinar or 0.0,
+                record.cert_amount_dinar or 0.0
+            ])
     # Tunisian Dinar currency record for reference
 
     # @api.onchange('dd_amount', 'dd_currency_id')
@@ -1312,3 +1324,20 @@ class PurchaseOrder(models.Model):
                     latest_rate = self.cert_currency_id.rate_ids.sorted('name', reverse=True)[0]
                     rate = latest_rate.rate
                 self.cert_amount_dinar = self.cert_amount * rate
+
+    additional_cost_per_unit = fields.Float(
+        string="Additional Cost per Unit (Dinar)",
+        compute="_compute_additional_cost_by_qty",
+        store=True,
+    )
+
+    @api.depends('total_amount_dinar', 'order_line.product_qty')
+    def _compute_additional_cost_by_qty(self):
+        for order in self:
+            # Total quantity across all lines
+            total_qty = sum(line.product_qty for line in order.order_line)
+            # Avoid division by zero
+            if total_qty:
+                order.additional_cost_per_unit = order.total_amount_dinar / total_qty
+            else:
+                order.additional_cost_per_unit = 0.0
