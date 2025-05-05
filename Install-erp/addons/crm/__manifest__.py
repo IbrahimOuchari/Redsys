@@ -21,6 +21,7 @@
         'digest',
         'phone_validation',
         'nn_admin',
+        'purchase'
     ],
     'data': [
         'security/crm_security.xml',

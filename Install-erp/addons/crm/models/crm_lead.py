@@ -2787,47 +2787,75 @@ class Lead(models.Model):
             # Écrase les anciennes lignes finales
             lead.final_product_list_ids = [(5, 0, 0)] + final_lines
 
-
     def action_create_rfq(self):
-        # Check preconditions before creating the RFQ
-        if not self.final_product_list_ids or not self.final_product_list_generated:
-            raise UserError("No final product list has been generated.")
-        if not self.partner_id:
-            raise UserError("Please select a customer first.")
-        if not self.partner_id.email:
-            raise UserError("The customer must have at least one email address.")
+        self.ensure_one()
 
-        # Prepare the values for creating the purchase RFQ
+        if not self.id:
+            raise UserError("Vous devez enregistrer l'enregistrement avant de créer le RFQ.")
+
+        if not self.final_product_list_ids or not self.final_product_list_generated:
+            raise UserError("Aucune liste de produits finaux n’a été générée.")
+        if not self.partner_id:
+            raise UserError("Veuillez sélectionner un client d'abord.")
+        if not self.partner_id.email:
+            raise UserError("Le client doit avoir au moins une adresse e-mail.")
+
         purchase_rfq_vals = {
             'partner_id': self.partner_id.id,
             'crm_lead_id': self.id,
-            # Add more fields as needed
+            # Ajouter d'autres champs si nécessaire
         }
 
-        # Create the purchase RFQ
         purchase_rfq = self.env['purchase.rfq'].create(purchase_rfq_vals)
 
-        # Create RFQ lines
         for rfq_line in self.final_product_list_ids:
             self.env['purchase.rfq.line'].create({
                 'order_id': purchase_rfq.id,
-                'product_id':rfq_line.product_template_id.id,
+                'product_id': rfq_line.product_template_id.id,
                 'barcode': rfq_line.barcode,
                 'name': rfq_line.description,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
             })
 
-        # Return a success notification
+        self.purchase_rfq_ids = [(4, purchase_rfq.id)]
+
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
-                'title': "Success",
-                'message': "The RFQ has been successfully created.",
-                'type': 'success',  # types: success, warning, danger, info
+                'title': "Succès",
+                'message': "Le RFQ a été créé avec succès.",
+                'type': 'success',
                 'sticky': False,
             }
         }
 
+    purchase_rfq_ids = fields.One2many(
+        'purchase.rfq',
+        'crm_lead_id',
+        string="Purchase Orders"
+    )
+    purchase_order_ids = fields.One2many(
+        'purchase.order',
+        'crm_lead_id',
+        string="Purchase Orders"
+    )
 
+
+    # Related fields of Cost Price Purchase Price
+    cost_line_ids = fields.One2many('purchase.order.cost.line',compute = '_compute_cost_line_ids',string="Cost Lines",store= False)
+
+    @api.depends('purchase_order_ids')
+    def _compute_cost_line_ids(self):
+        for lead in self:
+            # Get all related purchase orders
+            purchase_orders = lead.purchase_order_ids.ids
+
+            # Search cost lines linked to those purchase orders
+            cost_lines = self.env['purchase.order.cost.line'].search([
+                ('order_id', 'in', purchase_orders)
+            ])
+
+            # Assign to computed field
+            lead.cost_line_ids = cost_lines

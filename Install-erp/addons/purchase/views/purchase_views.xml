@@ -168,7 +168,9 @@
                     <button name="button_unlock" type="object" string="Unlock" invisible="state != 'done'"
                             groups="purchase.group_purchase_manager" data-hotkey="l"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,purchase,sent,done" readonly="1"/>
+
                 </header>
+
                 <sheet>
                     <div class="ribbon ribbon-top-right" invisible="state != 'sent'">
                         <span class="bg-info">Sent</span>
@@ -187,6 +189,7 @@
                         <h1 class="d-flex">
                             <field name="priority" widget="priority" class="me-3"/>
                             <field name="name" readonly="1"/>
+                            <field name="crm_lead_id" invisible="1" />
                         </h1>
                     </div>
                     <group>

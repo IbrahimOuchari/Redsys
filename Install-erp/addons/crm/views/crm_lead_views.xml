@@ -23,13 +23,15 @@
                             type="object"
                             string="Generate the final products list"
                             class="btn-primary"
-                           />
+                    />
                     <button name="action_create_rfq"
                             type="object"
                             string="Create RFQ"
                             class="btn-primary"
                     />
                     <field name="final_product_list_generated" invisible="1"/>
+                    <field name="purchase_rfq_ids" invisible="1"/>
+                    <field name="purchase_order_ids" invisible="1"/>
 
 
                     <field name="stage_id" widget="statusbar_duration"
@@ -399,6 +401,19 @@
                                     <field name="quantity"/>
                                     <field name="uom_id"/>
                                     <field name="unit_price"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Lignes de coût">
+                            <field name="cost_line_ids">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="barcode"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="purchase_price"/>
+                                    <field name="prix_de_revient"/>
                                 </tree>
                             </field>
                         </page>

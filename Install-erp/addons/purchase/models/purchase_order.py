@@ -1339,15 +1339,20 @@ class PurchaseOrder(models.Model):
             # Avoid division by zero
             if total_qty:
                 order.cost_by_product = order.total_amount_dinar / total_qty
-            else:
-                order.cost_by_product = 0.0
 
 
     cost_line_ids = fields.One2many('purchase.order.cost.line', 'order_id', string='Cost Lines')
 
-    @api.onchange('cost_line_ids')
+    @api.onchange('cost_line_ids','cost_by_product')
     def _onchange_cost_line_ids(self):
         for record in self:
             for lines in record.cost_line_ids:
-                if lines.purchase_price:
-                    lines.prix_de_revient = lines.purchase_price + record.cost_by_product
+               lines.prix_de_revient = lines.purchase_price  + record.cost_by_product
+
+
+
+    crm_lead_id = fields.Many2one(
+        'crm.lead',
+        string="CRM Lead",
+        help="Related CRM opportunity or lead"
+    )

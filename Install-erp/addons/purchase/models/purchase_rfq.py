@@ -526,6 +526,7 @@ class PurchaseRfq(models.Model):
     def button_creat_po(self):
         purchase_order = self.env['purchase.order'].create({
             'partner_id': self.partner_id.id,
+            'crm_lead_id':self.crm_lead_id.id,
             'rfq_seq': self.name,
             'partner_ref': self.partner_ref,
             'payment_term_id': self.payment_term_id.id,
@@ -913,11 +914,11 @@ class PurchaseRfq(models.Model):
         string="Tous les Fournisseurs",
         domain=[('is_supplier', '=', True)]
     )
-    crm_lead_id = fields.Many2one(
-        'crm.lead',
-        string="Piste CRM",
-        help="Piste CRM liée à cette commande d'achat"
-    )
+    # crm_lead_id = fields.Many2one(
+    #     'crm.lead',
+    #     string="Piste CRM",
+    #     help="Piste CRM liée à cette commande d'achat"
+    # )
 
     @api.onchange('suppliers_ids')
     def _onchange_suppliers_ids(self):
@@ -925,3 +926,8 @@ class PurchaseRfq(models.Model):
             record.partner_id = False
 
 
+    crm_lead_id = fields.Many2one(
+        'crm.lead',
+        string="CRM Lead",
+        help="Related CRM opportunity or lead"
+    )
