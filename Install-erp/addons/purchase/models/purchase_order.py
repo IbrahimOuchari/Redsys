@@ -1344,3 +1344,10 @@ class PurchaseOrder(models.Model):
 
 
     cost_line_ids = fields.One2many('purchase.order.cost.line', 'order_id', string='Cost Lines')
+
+    @api.onchange('cost_line_ids')
+    def _onchange_cost_line_ids(self):
+        for record in self:
+            for lines in record.cost_line_ids:
+                if lines.purchase_price:
+                    lines.prix_de_revient = lines.purchase_price + record.cost_by_product
