@@ -2850,3 +2850,9 @@ class Lead(models.Model):
     def _compute_cost_line_ids(self):
         for lead in self:
             lead.cost_line_ids = lead.purchase_order_ids.cost_line_ids
+
+    estimation_line_ids = fields.One2many(
+        'crm.lead.estimation.line',
+        'lead_id',
+        string="Estimations"
+    )

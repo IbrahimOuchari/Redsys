@@ -417,6 +417,21 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Estimation">
+                    <field name="estimation_line_ids">
+                        <tree editable="bottom">
+                            <field name="barcode"/>
+                            <field name="product_template_id"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="uom_id"/>
+                            <field name="price_proposed"/>
+                            <field name="total" readonly="1"/>
+                            <field name="sum_of_total" readonly="1"/>
+                        </tree>
+                    </field>
+
+                </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">

@@ -36,3 +36,6 @@ access_mail_activity_plan_template_sale_manager,mail.activity.plan.template.sale
 
 access_crm_initial_product_list_user,access.crm.initial.product.list.user,model_crm_initial_product_list,base.group_user,1,1,1,1
 access_crm_final_product_list_user,access.crm.final.product.list.user,model_crm_final_product_list,base.group_user,1,1,1,1
+
+
+access_crm_lead_estimation_line,access.crm.lead.estimation.line,model_crm_lead_estimation_line,,1,1,1,1
