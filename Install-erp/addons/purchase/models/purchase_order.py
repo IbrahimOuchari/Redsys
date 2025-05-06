@@ -1206,6 +1206,9 @@ class PurchaseOrder(models.Model):
 
 
     # New fields and functions
+
+
+    # New fields and functions
     # DD Fields
     dd_amount = fields.Float(string="DD Amount")
     dd_currency_id = fields.Many2one('res.currency', string="DD Currency")
@@ -1228,7 +1231,27 @@ class PurchaseOrder(models.Model):
 
 
     # Total Amount of Amount dinars
-    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_cost_by_product_total_amount_dinar", store=True)
+    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_total_amount_dinar", store=True)
+    @api.onchange('dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
+    def _compute_total_amount_dinar(self):
+        for record in self:
+            record.total_amount_dinar = sum([
+                record.dd_amount_dinar or 0.0,
+                record.transport_amount_dinar or 0.0,
+                record.transit_amount_dinar or 0.0,
+                record.cert_amount_dinar or 0.0
+            ])
+    # Tunisian Dinar currency record for reference
+
+    # @api.onchange('dd_amount', 'dd_currency_id')
+    # def _onchange_dd_fields(self):
+    #     if self.dd_amount:
+    #         if self.dd_currency_id == 'TND':
+    #             # If currency is Dinar, dinar amount equals original amount
+    #             self.dd_amount_dinar = self.dd_amount
+    #         else:
+    #             # If different currency, convert to Dinar
+    #             self.dd_amount_dinar = self.dd_amount * self.dd_currency_id.rate
 
     @api.onchange('dd_amount', 'dd_currency_id')
     def _onchange_dd_fields(self):
@@ -1305,26 +1328,22 @@ class PurchaseOrder(models.Model):
                     rate = latest_rate.rate
                 self.cert_amount_dinar = self.cert_amount * rate
 
+    cost_by_product = fields.Float(
+        string="Cost by product",
+        compute="_compute_additional_cost_by_qty",
+        store=True,
+    )
 
-    # Define the field first
-    cost_by_product = fields.Float(string='Cost Per Product', compute='_compute_additional_cost_by_qty', )
-
-    @api.onchange('total_amount_dinar', 'order_line.product_qty','dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
-    def _compute_cost_by_product_total_amount_dinar(self):
+    @api.depends('total_amount_dinar', 'order_line.product_qty')
+    def _compute_additional_cost_by_qty(self):
         for order in self:
-            order.total_amount_dinar = sum([
-                order.dd_amount_dinar or 0.0,
-                order.transport_amount_dinar or 0.0,
-                order.transit_amount_dinar or 0.0,
-                order.cert_amount_dinar or 0.0
-            ])
             # Total quantity across all lines
             total_qty = sum(line.product_qty for line in order.order_line)
             # Avoid division by zero
             if total_qty:
                 order.cost_by_product = order.total_amount_dinar / total_qty
-            else:
-                order.cost_by_product = 0.0
+
+
 
 
     cost_line_ids = fields.One2many('purchase.order.cost.line', 'order_id', string='Cost Lines')

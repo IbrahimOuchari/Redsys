@@ -931,3 +931,4 @@ class PurchaseRfq(models.Model):
         string="CRM Lead",
         help="Related CRM opportunity or lead"
     )
+
