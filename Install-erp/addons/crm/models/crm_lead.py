@@ -2846,16 +2846,7 @@ class Lead(models.Model):
     # Related fields of Cost Price Purchase Price
     cost_line_ids = fields.One2many('purchase.order.cost.line',compute = '_compute_cost_line_ids',string="Cost Lines",store= False)
 
-    @api.depends('purchase_order_ids')
+
     def _compute_cost_line_ids(self):
         for lead in self:
-            # Get all related purchase orders
-            purchase_orders = lead.purchase_order_ids.ids
-
-            # Search cost lines linked to those purchase orders
-            cost_lines = self.env['purchase.order.cost.line'].search([
-                ('order_id', 'in', purchase_orders)
-            ])
-
-            # Assign to computed field
-            lead.cost_line_ids = cost_lines
+            lead.cost_line_ids = lead.purchase_order_ids.cost_line_ids
