@@ -50,3 +50,5 @@ class CrmLeadEstimation(models.Model):
                 line.sum_of_total = total_sum
             else:
                 line.sum_of_total = 0.0
+
+

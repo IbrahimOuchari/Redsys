@@ -2737,9 +2737,9 @@ class Lead(models.Model):
     final_product_list_generated = fields.Boolean(string="Final Product is generated" , readonly=False,default= False)
 
     final_product_list_ids = fields.One2many(
-        comodel_name='crm.final.product.list',
-        inverse_name='lead_id',
-        string="Final Product Lines"
+    comodel_name='crm.final.product.list',
+    inverse_name='lead_id',
+    string="Final Product Lines"
     )
 
     def action_generate_final_product_lines(self):
@@ -2856,3 +2856,17 @@ class Lead(models.Model):
         'lead_id',
         string="Estimations"
     )
+
+
+    @api.onchange('final_product_list_ids')
+    def _onchange_copy_final_products_to_estimations(self):
+        for lead in self:
+            for final_product in lead.final_product_list_ids:
+                self.env['crm.lead.estimation.line'].create({
+                    'lead_id': lead.id,
+                    'product_id': final_product.product_id.id,
+                    'barcode': final_product.barcode,
+                    'quantity': final_product.quantity,
+                    'uom_id': final_product.uom_id.id,
+                    'price_proposed': final_product.unit_price,
+                })
