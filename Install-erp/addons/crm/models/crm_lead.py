@@ -2861,6 +2861,7 @@ class Lead(models.Model):
     @api.onchange('final_product_list_ids')
     def _onchange_copy_final_products_to_estimations(self):
         for lead in self:
+            lead.estimation_line_ids = [(5,0,0)]
             for final_product in lead.final_product_list_ids:
                 self.env['crm.lead.estimation.line'].create({
                     'lead_id': lead.id,
