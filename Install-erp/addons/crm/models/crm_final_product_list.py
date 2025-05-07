@@ -22,3 +22,6 @@ class FinalProductList(models.Model):
         string="CRM Lead",
         ondelete='cascade'
     )
+    prix_revient = fields.Float(
+        string="Prix de Revient", store=True
+    )

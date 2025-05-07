@@ -2754,7 +2754,6 @@ class Lead(models.Model):
                     # Produit existant → remplir avec les infos du produit.template
                     final_lines.append((0, 0, {
                         'barcode': barcode,
-                        'detailed_type':product,
                         'product_id': product.id,
                         'description': product.description_sale,
                         'quantity': line.quantity,
@@ -2770,6 +2769,7 @@ class Lead(models.Model):
                         'uom_id': line.unit_of_measure_id.id,
                         'uom_po_id': line.unit_of_measure_id.id,  # Using the same UOM for purchase
                         'type': 'product',  # Set default type, adjust if needed
+                        'detailed_type': 'product',  # Ensure it is a storable product
                         'list_price': 0.0,  # Default price
                     })
 
@@ -2879,3 +2879,154 @@ class Lead(models.Model):
     #     for lead in self :
     #         lead.estimation_line_ids.sum_of_total = sum(line.total for line in lead.estimation_line_ids)
     #
+
+    # EXTRA FIELD dd cert trnasport transit
+    # DD Fields
+    dd_amount = fields.Float(string="DD Amount")
+    dd_currency_id = fields.Many2one('res.currency', string="DD Currency")
+    dd_amount_dinar = fields.Float(string="DD Amount in Dinar")
+
+    # Transport Fields
+    transport_amount = fields.Float(string="Transport Amount")
+    transport_currency_id = fields.Many2one('res.currency', string="Transport Currency")
+    transport_amount_dinar = fields.Float(string="Transport Amount in Dinar")
+
+    # Transit Fields
+    transit_amount = fields.Float(string="Transit Amount")
+    transit_currency_id = fields.Many2one('res.currency', string="Transit Currency")
+    transit_amount_dinar = fields.Float(string="Transit Amount in Dinar")
+
+    # Cert Fields
+    cert_amount = fields.Float(string="Cert Amount")
+    cert_currency_id = fields.Many2one('res.currency', string="Cert Currency")
+    cert_amount_dinar = fields.Float(string="Cert Amount in Dinar")
+
+
+    # Total Amount of Amount dinars
+    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_total_amount_dinar", store=True)
+    @api.onchange('dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
+    def _compute_total_amount_dinar(self):
+        for record in self:
+            record.total_amount_dinar = sum([
+                record.dd_amount_dinar or 0.0,
+                record.transport_amount_dinar or 0.0,
+                record.transit_amount_dinar or 0.0,
+                record.cert_amount_dinar or 0.0
+            ])
+    # Tunisian Dinar currency record for reference
+
+    # @api.onchange('dd_amount', 'dd_currency_id')
+    # def _onchange_dd_fields(self):
+    #     if self.dd_amount:
+    #         if self.dd_currency_id == 'TND':
+    #             # If currency is Dinar, dinar amount equals original amount
+    #             self.dd_amount_dinar = self.dd_amount
+    #         else:
+    #             # If different currency, convert to Dinar
+    #             self.dd_amount_dinar = self.dd_amount * self.dd_currency_id.rate
+
+    @api.onchange('dd_amount', 'dd_currency_id')
+    def _onchange_dd_fields(self):
+        if self.dd_amount:
+            if self.dd_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.dd_amount_dinar = self.dd_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.dd_currency_id:
+                    # Get the latest rate for the currency for the current company
+                    latest_rate = self.env['res.currency.rate'].search([
+                        ('currency_id', '=', self.dd_currency_id.id),
+                        ('company_id', '=', self.env.company.id)
+                    ], order='name desc', limit=1)
+
+                    if latest_rate:
+                        rate = latest_rate.rate
+                self.dd_amount_dinar = self.dd_amount * rate
+
+    @api.onchange('transport_amount', 'transport_currency_id')
+    def _onchange_transport_fields(self):
+        if self.transport_amount:
+            if self.transport_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.transport_amount_dinar = self.transport_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.transport_currency_id:
+                    # Get the latest rate for the currency for the current company
+                    latest_rate = self.env['res.currency.rate'].search([
+                        ('currency_id', '=', self.transport_currency_id.id),
+                        ('company_id', '=', self.env.company.id)
+                    ], order='name desc', limit=1)
+
+                    if latest_rate:
+                        rate = latest_rate.rate
+                self.transport_amount_dinar = self.transport_amount * rate
+
+    @api.onchange('transit_amount', 'transit_currency_id')
+    def _onchange_transit_fields(self):
+        if self.transit_amount:
+            if self.transit_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.transit_amount_dinar = self.transit_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.transit_currency_id:
+                    # Get the latest rate for the currency for the current company
+                    latest_rate = self.env['res.currency.rate'].search([
+                        ('currency_id', '=', self.transit_currency_id.id),
+                        ('company_id', '=', self.env.company.id)
+                    ], order='name desc', limit=1)
+
+                    if latest_rate:
+                        rate = latest_rate.rate
+                self.transit_amount_dinar = self.transit_amount * rate
+
+    @api.onchange('cert_amount', 'cert_currency_id')
+    def _onchange_cert_fields(self):
+        if self.cert_amount:
+            if self.cert_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.cert_amount_dinar = self.cert_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.cert_currency_id and self.cert_currency_id.rate_ids:
+                    # Get the latest rate for the currency
+                    latest_rate = self.cert_currency_id.rate_ids.sorted('name', reverse=True)[0]
+                    rate = latest_rate.rate
+                self.cert_amount_dinar = self.cert_amount * rate
+
+    cost_by_product = fields.Float(
+        string="Cost by product",
+        compute="_compute_additional_cost_by_qty",
+        store=True,
+    )
+
+    @api.depends('total_amount_dinar', 'final_product_list_ids.quantity')
+    def _compute_additional_cost_by_qty(self):
+        for lead in self:
+            # Total quantity across all lines
+            total_qty = sum(line.quantity for line in lead.final_product_list_ids)
+            # Avoid division by zero
+            if total_qty:
+                lead.cost_by_product = lead.total_amount_dinar / total_qty
+
+
+    @api.depends('final_product_list_ids.prix_revient')
+    def _onchange_prix_revient(self):
+        """Update 'Prix de Revient' in final product list lines based on estimation lines."""
+        for lead in self:
+            for estimation_line in lead.estimation_line_ids:
+        # Find matching final product line by barcode and product_id
+                matching_final_line = lead.final_product_list_ids.filtered(
+                    lambda line : line.barcode == estimation_line.barcode and
+                                  line.product_id == estimation_line.product_id.id
+                )
+
+                # Update prix_revient if found
+                if matching_final_line:
+                    matching_final_line.prix_revient = estimation_line.prix_revient

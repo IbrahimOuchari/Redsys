@@ -34,7 +34,7 @@ class CrmLeadEstimation(models.Model):
     sum_of_total = fields.Float(
         string="Total Global", compute='_compute_sum_of_total', store=True
     )
-    
+
 
     @api.depends('lead_id.estimation_line_ids.total')
     def _compute_sum_of_total(self):
@@ -46,3 +46,18 @@ class CrmLeadEstimation(models.Model):
                 line.sum_of_total = total_sum
             else:
                 line.sum_of_total = 0.0
+
+
+    prix_revient = fields.Float(
+        string="Prix de Revient", compute='_compute_prix_revient', store=True
+    )
+    @api.depends('currency_id','price_proposed','lead_id.cost_by_product')
+    def _compute_prix_de_revient(self):
+        for lead in self:
+            if lead.currency_id and lead.price_proposed:
+                rate = 1.0
+                latest_rate= self.currency_id.rate_ids.sorted('name',reverse=True)[0]
+                rate = latest_rate.rate
+                lead.prix_revient = (lead.price_proposed * rate)/ lead.cost_by_product
+
+
