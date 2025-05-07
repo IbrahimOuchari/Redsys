@@ -2857,7 +2857,7 @@ class Lead(models.Model):
         string="Estimations"
     )
 
-
+    # this function will copy the lines from final product list to emtimation
     @api.onchange('final_product_list_ids')
     def _onchange_copy_final_products_to_estimations(self):
         for lead in self:
@@ -2871,3 +2871,11 @@ class Lead(models.Model):
                     'uom_id': final_product.uom_id.id,
                     'price_proposed': final_product.unit_price,
                 })
+
+
+    # this function will calculate the SUM OF FIELD total inside the esmtimation lines
+    # @api.depends('estimation_line_ids')
+    # def _onchange_estimation_line_ids(self):
+    #     for lead in self :
+    #         lead.estimation_line_ids.sum_of_total = sum(line.total for line in lead.estimation_line_ids)
+    #

@@ -31,24 +31,18 @@ class CrmLeadEstimation(models.Model):
         for line in self:
             line.total = (line.price_proposed or 0.0) * (line.quantity or 0.0)
 
-    sum_of_total = fields.Monetary(
-        string="Total des estimations",
-        currency_field='currency_id',
-        compute='_compute_sum_of_total',
-        store=True
+    sum_of_total = fields.Float(
+        string="Total Global", compute='_compute_sum_of_total', store=True
     )
+    
 
-
-    @api.depends('lead_id','price_proposed','total')
+    @api.depends('lead_id.estimation_line_ids.total')
     def _compute_sum_of_total(self):
+        """Compute the total sum of all estimation lines for the same lead,
+        and assign it to each line belonging to that lead."""
         for line in self:
             if line.lead_id:
-                # Get all lines for the same lead
-                related_lines = self.search([('lead_id', '=', line.lead_id.id)])
-                # Make sure they share the same currency
-                total_sum = sum(l.total for l in related_lines if l.currency_id == line.currency_id)
+                total_sum = sum(l.total for l in line.lead_id.estimation_line_ids)
                 line.sum_of_total = total_sum
             else:
                 line.sum_of_total = 0.0
-
-
