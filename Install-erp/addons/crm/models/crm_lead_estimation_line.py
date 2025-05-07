@@ -12,8 +12,8 @@ class CrmLeadEstimation(models.Model):
     )
 
     barcode = fields.Char(string="PN")
-    product_template_id = fields.Many2one('product.template', string="Produit")
-    description = fields.Char(string="Description")
+    product_id = fields.Many2one('product.template', string="Produit")
+    description = fields.Text(related='product_id.description_sale',string="Description")
     quantity = fields.Float(string="Quantité", default=1.0)
     uom_id = fields.Many2one('uom.uom', string="Unité de mesure")
     currency_id = fields.Many2one('res.currency', string="Devise")

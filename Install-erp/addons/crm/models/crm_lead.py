@@ -2755,8 +2755,8 @@ class Lead(models.Model):
                     final_lines.append((0, 0, {
                         'barcode': barcode,
                         'detailed_type':product,
-                        'product_template_id': product.id,
-                        'description': product.sale_description,
+                        'product_id': product.id,
+                        'description': product.description_sale,
                         'quantity': line.quantity,
                         'uom_id': product.uom_id.id,
                         'unit_price': product.list_price,
@@ -2776,8 +2776,8 @@ class Lead(models.Model):
                     # Utiliser le nouveau produit créé
                     final_lines.append((0, 0, {
                         'barcode': barcode,
-                        'product_template_id': new_product.id,
-                        'description': new_product.name,
+                        'product_id': new_product.id,
+                        'description': new_product.description,
                         'quantity': line.quantity,
                         'uom_id': new_product.uom_id.id,
                         'unit_price': new_product.list_price,
@@ -2811,7 +2811,7 @@ class Lead(models.Model):
         for rfq_line in self.final_product_list_ids:
             self.env['purchase.rfq.line'].create({
                 'order_id': purchase_rfq.id,
-                'product_id': rfq_line.product_template_id.id,
+                'product_id': rfq_line.product_id.id,
                 'barcode': rfq_line.barcode,
                 'name': rfq_line.description,
                 'product_qty': rfq_line.quantity,

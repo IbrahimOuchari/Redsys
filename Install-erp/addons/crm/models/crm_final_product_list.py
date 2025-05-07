@@ -5,11 +5,11 @@ class FinalProductList(models.Model):
     _description = 'Final Product List'
 
     barcode = fields.Char(string="PN", help="Part Number")
-    product_template_id = fields.Many2one(
+    product_id = fields.Many2one(
         comodel_name='product.template',
         string="Product"
     )
-    description = fields.Char(string="Description")
+    description = fields.Text(related='product_id.description_sale',string="Description")
     quantity = fields.Float(string="Quantity", default=1.0)
     uom_id = fields.Many2one(
         comodel_name='uom.uom',
