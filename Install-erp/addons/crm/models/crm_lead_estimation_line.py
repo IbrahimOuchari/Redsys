@@ -49,7 +49,7 @@ class CrmLeadEstimation(models.Model):
 
 
     prix_revient = fields.Float(
-        string="Prix de Revient", compute='_compute_prix_revient', store=True
+        string="Prix de Revient", compute='_compute_prix_de_revient', store=True
     )
     @api.depends('currency_id','price_proposed','lead_id.cost_by_product')
     def _compute_prix_de_revient(self):
