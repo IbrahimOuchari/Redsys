@@ -36,7 +36,6 @@ class PurchaseRfq(models.Model):
     partner_id = fields.Many2one(
         'res.partner',
         string='Vendor',
-        required=True,
         change_default=True,
         tracking=True,
         check_company=True,
@@ -325,162 +324,60 @@ class PurchaseRfq(models.Model):
     # ACTIONS
     # ------------------------------------------------------------
 
-    # def action_rfq_send(self):
-    #     '''
-    #     This function opens a window to compose an email, with the edi purchase template message loaded by default
-    #     '''
-    #     self.ensure_one()
-    #     ir_model_data = self.env['ir.model.data']
-    #     try:
-    #         if self.env.context.get('send_rfq', False):
-    #             template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase')[1]
-    #         else:
-    #             template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_done')[1]
-    #     except ValueError:
-    #         template_id = False
-    #     try:
-    #         compose_form_id = ir_model_data._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
-    #     except ValueError:
-    #         compose_form_id = False
-    #     ctx = dict(self.env.context or {})
-    #     ctx.update({
-    #         'default_model': 'purchase.rfq',
-    #         'default_res_ids': self.ids,
-    #         'default_template_id': template_id,
-    #         'default_composition_mode': 'comment',
-    #         'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
-    #         'force_email': True,
-    #         'mark_rfq_as_sent': True,
-    #     })
-    #
-    #     # In the case of a RFQ or a PO, we want the "View..." button in line with the state of the
-    #     # object. Therefore, we pass the model description in the context, in the language in which
-    #     # the template is rendered.
-    #     lang = self.env.context.get('lang')
-    #     if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
-    #         template = self.env['mail.template'].browse(ctx['default_template_id'])
-    #         if template and template.lang:
-    #             lang = template._render_lang([ctx['default_res_id']])[ctx['default_res_id']]
-    #
-    #     self = self.with_context(lang=lang)
-    #     if self.state in ['draft', 'sent']:
-    #         ctx['model_description'] = _('Request for Quotation')
-    #     else:
-    #         ctx['model_description'] = _('Purchase Order')
-    #
-    #     return {
-    #         'name': _('Compose Email'),
-    #         'type': 'ir.actions.act_window',
-    #         'view_mode': 'form',
-    #         'res_model': 'mail.compose.message',
-    #         'views': [(compose_form_id, 'form')],
-    #         'view_id': compose_form_id,
-    #         'target': 'new',
-    #         'context': ctx,
-    #     }
-
-    # def action_rfq_send(self):
-    #     '''
-    #     This function opens a window to compose an email, with the edi purchase template message loaded by default
-    #     '''
-    #     self.ensure_one()
-    #     ir_model_data = self.env['ir.model.data']
-    #     try:
-    #         if self.env.context.get('send_rfq', False):
-    #             template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq')[1]
-    #         else:
-    #             template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq_done')[1]
-    #     except ValueError:
-    #         template_id = False
-    #     try:
-    #         compose_form_id = ir_model_data._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
-    #     except ValueError:
-    #         compose_form_id = False
-    #     ctx = dict(self.env.context or {})
-    #     ctx.update({
-    #         'default_model': 'purchase.rfq',
-    #         'default_res_ids': self.ids,
-    #         'default_template_id': template_id,
-    #         'default_composition_mode': 'comment',
-    #         'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
-    #         'force_email': True,
-    #         'mark_rfq_as_sent': True,
-    #     })
-    #
-    #     # In the case of a RFQ or a PO, we want the "View..." button in line with the state of the
-    #     # object. Therefore, we pass the model description in the context, in the language in which
-    #     # the template is rendered.
-    #     lang = self.env.context.get('lang')
-    #     if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
-    #         template = self.env['mail.template'].browse(ctx['default_template_id'])
-    #         if template and template.lang:
-    #             lang = template._render_lang([ctx['default_res_id']])[ctx['default_res_id']]
-    #
-    #     self = self.with_context(lang=lang)
-    #     if self.state in ['draft', 'sent']:
-    #         ctx['model_description'] = _('Request for Quotation')
-    #     else:
-    #         ctx['model_description'] = _('Purchase Order')
-    #
-    #     return {
-    #         'name': _('Compose Email'),
-    #         'type': 'ir.actions.act_window',
-    #         'view_mode': 'form',
-    #         'res_model': 'mail.compose.message',
-    #         'views': [(compose_form_id, 'form')],
-    #         'view_id': compose_form_id,
-    #         'target': 'new',
-    #         'context': ctx,
-    #     }
-
     def action_rfq_send(self):
-        """
-        Envoie un email individuel à chaque fournisseur dans suppliers_ids uniquement,
-        avec un corps de message personnalisé.
-        """
+        '''
+        This function opens a window to compose an email, with the edi purchase template message loaded by default
+        '''
         self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            if self.env.context.get('send_rfq', False):
+                template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq')[1]
+            else:
+                template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq_done')[1]
+        except ValueError:
+            template_id = False
+        try:
+            compose_form_id = ir_model_data._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        ctx = dict(self.env.context or {})
+        ctx.update({
+            'default_model': 'purchase.rfq',
+            'default_res_ids': self.ids,
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
+            'force_email': True,
+            'mark_rfq_as_sent': True,
+        })
 
-        # Déterminer le type de document (RFQ ou commande)
-        model_description = _('Demande de prix') if self.state in ['draft', 'sent'] else _('Bon de commande')
+        # In the case of a RFQ or a PO, we want the "View..." button in line with the state of the
+        # object. Therefore, we pass the model description in the context, in the language in which
+        # the template is rendered.
+        lang = self.env.context.get('lang')
+        if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
+            template = self.env['mail.template'].browse(ctx['default_template_id'])
+            if template and template.lang:
+                lang = template._render_lang([ctx['default_res_id']])[ctx['default_res_id']]
 
-        # Envoyer l'email à chaque fournisseur dans suppliers_ids
-        for supplier in self.suppliers_ids:
-            if not supplier.email:
-                continue  # Ignorer les fournisseurs sans email
+        self = self.with_context(lang=lang)
+        if self.state in ['draft', 'sent']:
+            ctx['model_description'] = _('Request for Quotation')
+        else:
+            ctx['model_description'] = _('Purchase Order')
 
-            # Corps de l'email (selon ton modèle imposé)
-            email_body = _('''
-                <div>
-                    <p style="font-size: 13px;">
-                        Bonjour %(name)s %(parent)s,<br/><br/>
-                        Veuillez trouver en pièce jointe une %(doc_type)s <b>%(doc_name)s</b> %(ref)s de la société %(company)s.<br/><br/>
-                        Si vous avez des questions, n'hésitez pas à nous contacter.<br/><br/>
-                        Cordialement,<br/>
-                        %(signature)s
-                    </p>
-                </div>
-            ''') % {
-                'name': supplier.name or '',
-                'parent': f"({supplier.parent_id.name})" if supplier.parent_id else '',
-                'doc_type': model_description,
-                'doc_name': self.name or '',
-                'ref': f"(réf : {self.partner_ref})" if self.partner_ref else '',
-                'company': self.company_id.name or '',
-                'signature': self.user_id.signature or '',
-            }
+        return {
+            'name': _('Compose Email'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
 
-            # Préparer les valeurs de l’email
-            email_values = {
-                'email_to': supplier.email,
-                'partner_ids': [supplier.id],
-                'subject': _('%s - Commande (Réf %s)') % (self.company_id.name, self.name or 'n/a'),
-                'body_html': email_body,
-            }
-
-            # Envoi de l'email sans utiliser de modèle d'email
-            self.env['mail.mail'].create(email_values).send()
-
-        return {'type': 'ir.actions.act_window_close'}
 
     # def print_quotation(self):
     #     self.write({'state': "sent"})

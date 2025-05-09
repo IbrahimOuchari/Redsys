@@ -96,7 +96,9 @@
                                    context="{'res_partner_search_mode': 'supplier', 'show_vat': True}"
                                    placeholder="Name, TIN, Email, or Reference"
                                    readonly="state in ['cancel', 'purchase']"
-                                   options="{'no_create': True}"/>
+                                   options="{'no_create': True}"
+                                   required="state == 'sent'"
+                                   invisible="state != 'sent'"/>
                             >
                             <field name="partner_ref"/>
 
