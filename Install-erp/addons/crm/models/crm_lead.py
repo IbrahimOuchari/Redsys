@@ -2919,138 +2919,35 @@ class Lead(models.Model):
 
     # EXTRA FIELD dd cert trnasport transit
     # DD Fields
-    dd_amount = fields.Float(string="DD Amount")
-    dd_currency_id = fields.Many2one('res.currency', string="DD Currency")
-    dd_amount_dinar = fields.Float(string="DD Amount in Dinar")
+    dd_amount = fields.Float(related='purchase_order_ids.dd_amount', string="DD Amount", store=True)
+    dd_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.dd_currency_id', string="DD Currency",
+                                     store=True)
+    dd_amount_dinar = fields.Float(related='purchase_order_ids.dd_amount_dinar', string="DD Amount in Dinar",
+                                   store=True)
 
-    # Transport Fields
-    transport_amount = fields.Float(string="Transport Amount")
-    transport_currency_id = fields.Many2one('res.currency', string="Transport Currency")
-    transport_amount_dinar = fields.Float(string="Transport Amount in Dinar")
+    transport_amount = fields.Float(related='purchase_order_ids.transport_amount', string="Transport Amount",
+                                    store=True)
+    transport_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.transport_currency_id',
+                                            string="Transport Currency", store=True)
+    transport_amount_dinar = fields.Float(related='purchase_order_ids.transport_amount_dinar',
+                                          string="Transport Amount in Dinar", store=True)
 
-    # Transit Fields
-    transit_amount = fields.Float(string="Transit Amount")
-    transit_currency_id = fields.Many2one('res.currency', string="Transit Currency")
-    transit_amount_dinar = fields.Float(string="Transit Amount in Dinar")
+    transit_amount = fields.Float(related='purchase_order_ids.transit_amount', string="Transit Amount", store=True)
+    transit_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.transit_currency_id',
+                                          string="Transit Currency", store=True)
+    transit_amount_dinar = fields.Float(related='purchase_order_ids.transit_amount_dinar',
+                                        string="Transit Amount in Dinar", store=True)
 
-    # Cert Fields
-    cert_amount = fields.Float(string="Cert Amount")
-    cert_currency_id = fields.Many2one('res.currency', string="Cert Currency")
-    cert_amount_dinar = fields.Float(string="Cert Amount in Dinar")
+    cert_amount = fields.Float(related='purchase_order_ids.cert_amount', string="Cert Amount", store=True)
+    cert_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.cert_currency_id',
+                                       string="Cert Currency", store=True)
+    cert_amount_dinar = fields.Float(related='purchase_order_ids.cert_amount_dinar', string="Cert Amount in Dinar",
+                                     store=True)
 
+    total_amount_dinar = fields.Float(related='purchase_order_ids.total_amount_dinar', string="Total Amount in Dinar",
+                                      store=True)
+    cost_by_product = fields.Float(related='purchase_order_ids.cost_by_product', string="Cost by product", store=True)
 
-    # Total Amount of Amount dinars
-    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_total_amount_dinar", store=True)
-    @api.onchange('dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
-    def _compute_total_amount_dinar(self):
-        for record in self:
-            record.total_amount_dinar = sum([
-                record.dd_amount_dinar or 0.0,
-                record.transport_amount_dinar or 0.0,
-                record.transit_amount_dinar or 0.0,
-                record.cert_amount_dinar or 0.0
-            ])
-    # Tunisian Dinar currency record for reference
-
-    # @api.onchange('dd_amount', 'dd_currency_id')
-    # def _onchange_dd_fields(self):
-    #     if self.dd_amount:
-    #         if self.dd_currency_id == 'TND':
-    #             # If currency is Dinar, dinar amount equals original amount
-    #             self.dd_amount_dinar = self.dd_amount
-    #         else:
-    #             # If different currency, convert to Dinar
-    #             self.dd_amount_dinar = self.dd_amount * self.dd_currency_id.rate
-
-    @api.onchange('dd_amount', 'dd_currency_id')
-    def _onchange_dd_fields(self):
-        if self.dd_amount:
-            if self.dd_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
-                self.dd_amount_dinar = self.dd_amount
-            else:
-                # If different currency, convert to Dinar using currency rate
-                rate = 1.0
-                if self.dd_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.dd_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
-                self.dd_amount_dinar = self.dd_amount * rate
-
-    @api.onchange('transport_amount', 'transport_currency_id')
-    def _onchange_transport_fields(self):
-        if self.transport_amount:
-            if self.transport_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
-                self.transport_amount_dinar = self.transport_amount
-            else:
-                # If different currency, convert to Dinar using currency rate
-                rate = 1.0
-                if self.transport_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.transport_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
-                self.transport_amount_dinar = self.transport_amount * rate
-
-    @api.onchange('transit_amount', 'transit_currency_id')
-    def _onchange_transit_fields(self):
-        if self.transit_amount:
-            if self.transit_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
-                self.transit_amount_dinar = self.transit_amount
-            else:
-                # If different currency, convert to Dinar using currency rate
-                rate = 1.0
-                if self.transit_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.transit_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
-                self.transit_amount_dinar = self.transit_amount * rate
-
-    @api.onchange('cert_amount', 'cert_currency_id')
-    def _onchange_cert_fields(self):
-        if self.cert_amount:
-            if self.cert_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
-                self.cert_amount_dinar = self.cert_amount
-            else:
-                # If different currency, convert to Dinar using currency rate
-                rate = 1.0
-                if self.cert_currency_id and self.cert_currency_id.rate_ids:
-                    # Get the latest rate for the currency
-                    latest_rate = self.cert_currency_id.rate_ids.sorted('name', reverse=True)[0]
-                    rate = latest_rate.rate
-                self.cert_amount_dinar = self.cert_amount * rate
-
-    cost_by_product = fields.Float(
-        string="Cost by product",
-        compute="_compute_additional_cost_by_qty",
-        store=True,
-    )
-
-    @api.depends('total_amount_dinar', 'final_product_list_ids.quantity')
-    def _compute_additional_cost_by_qty(self):
-        for lead in self:
-            # Total quantity across all lines
-            total_qty = sum(line.quantity for line in lead.final_product_list_ids)
-            # Avoid division by zero
-            if total_qty:
-                lead.cost_by_product = lead.total_amount_dinar / total_qty
 
 
     @api.depends('final_product_list_ids.prix_revient')

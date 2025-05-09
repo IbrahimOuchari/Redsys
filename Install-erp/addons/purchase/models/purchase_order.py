@@ -1246,7 +1246,7 @@ class PurchaseOrder(models.Model):
 
 
     # Total Amount of Amount dinars
-    total_amount_dinar = fields.Float(string="Total Amount in Dinar", compute="_compute_total_amount_dinar", store=True)
+    total_amount_dinar = fields.Float(string="Total Amount in Dinar", store=True)
     @api.onchange('dd_amount_dinar', 'transport_amount_dinar', 'transit_amount_dinar', 'cert_amount_dinar')
     def _compute_total_amount_dinar(self):
         for record in self:
