@@ -2814,13 +2814,13 @@ class Lead(models.Model):
                 'order_id': purchase_rfq.id,
                 'product_id': rfq_line.product_id.id,
                 'barcode': rfq_line.barcode,
-                'name': rfq_line.name,
+                'name': rfq_line.description,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
             })
 
         self.purchase_rfq_ids = [(4, purchase_rfq.id)]
-
+        self.rfq_created = True
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -3033,36 +3033,55 @@ class Lead(models.Model):
                     matching_final_line.prix_revient = estimation_line.prix_revient
 
 
-    purchase_order_count = fields.Integer(
+    purchase_order_created = fields.Boolean(
         string='Nombre de Commandes',
+        compute='_compute_purchase_order_created'
     )
-
+    def _compute_purchase_order_created(self):
+        self.ensure_one()
+        purchase_order = self.env['purchase.order'].search([('crm_lead_id','=',self.id)])
+        if purchase_order:
+            self.purchase_order_created = True
+        else:
+            self.purchase_order_created = False
 
 
     def action_view_purchase_rfq(self):
         self.ensure_one()
+        purchase_order = self.env['purchase.order'].search([('crm_lead_id','=',self.id)],limit=1)
         return {
             'type': 'ir.actions.act_window',
             'name': 'Purchase Order',
             'res_model': 'purchase.order',
+            'res_id': purchase_order.id,
             'view_mode': 'form',
-            'domain': [('crm_lead_id', '=', self.id)],
-            'context': {'default_crm_lead_id': self.id},
+            'target': 'current',
         }
 
-    rfq_count = fields.Integer(
-        string="Nombre de RFQ",
+    rfq_created = fields.Boolean(
+        string="Nombre de RFQ",default = False
     )
-
-
 
     def action_view_rfqs(self):
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'RFQ',
-            'res_model': 'purchase.rfq',
-            'view_mode': 'form',
-            'domain': [('crm_lead_id', '=', self.id)],
-            'context': {'default_crm_lead_id': self.id},
-        }
+        rfq = self.env['purchase.rfq'].search([('crm_lead_id', '=', self.id)], limit=1)
+        if rfq:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Demande de prix',
+                'res_model': 'purchase.rfq',
+                'res_id': rfq.id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+        else:
+            # Optional: show warning if no RFQ found
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Aucun RFQ',
+                    'message': 'Aucune demande de prix liée à cette opportunité.',
+                    'type': 'warning',
+                }
+            }
