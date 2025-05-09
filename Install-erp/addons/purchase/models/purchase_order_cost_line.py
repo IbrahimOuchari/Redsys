@@ -15,8 +15,14 @@ class PurchaseOrderCostLine(models.Model):
     quantity = fields.Float(string='Quantity')
     uom_id = fields.Many2one('uom.uom', string='Unit of Measure')
     purchase_price = fields.Float(string='Purchase Price')
+    cost_by_product = fields.Float(
+        string="Cost by product",
+        store=True,
+        related= 'order_id.cost_by_product'
+    )
 
 
+    # This Field is controlled by  FUNCTION from purchase Order _onchange_cost_line_ids
     prix_de_revient = fields.Float(
         string='Cost Price',
     )

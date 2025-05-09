@@ -1330,11 +1330,10 @@ class PurchaseOrder(models.Model):
 
     cost_by_product = fields.Float(
         string="Cost by product",
-        compute="_compute_additional_cost_by_qty",
         store=True,
     )
 
-    @api.depends('total_amount_dinar', 'order_line.product_qty')
+    @api.onchange('total_amount_dinar', 'order_line.product_qty')
     def _compute_additional_cost_by_qty(self):
         for order in self:
             # Total quantity across all lines
@@ -1361,3 +1360,21 @@ class PurchaseOrder(models.Model):
         string="CRM Lead",
         help="Related CRM opportunity or lead"
     )
+
+
+    @api.onchange('order_line')
+    def _onchange_order_line_to_cost_lines(self):
+        new_cost_lines = []
+        self.cost_line_ids = [(5,0,0)]
+        for line in self.order_line:
+            new_cost_lines.append((0, 0, {
+                'product_id': line.product_id.id,
+                'description': line.name,
+                'quantity': line.product_qty,
+                'uom_id': line.product_uom.id,
+                'purchase_price': line.price_unit,
+                'cost_by_product': self.cost_by_product,
+                # prix_de_revient is left empty for now (optional)
+            }))
+
+        self.cost_line_ids = new_cost_lines

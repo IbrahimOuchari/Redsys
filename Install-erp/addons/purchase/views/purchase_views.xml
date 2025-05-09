@@ -653,6 +653,7 @@
                                     <field name="quantity"/>
                                     <field name="uom_id"/>
                                     <field name="purchase_price"/>
+                                    <field name="cost_by_product"/>
                                     <field name="prix_de_revient"/>
                                 </tree>
                             </field>

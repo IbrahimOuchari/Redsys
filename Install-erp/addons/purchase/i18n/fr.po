@@ -26,6 +26,16 @@ msgstr "# Factures fournisseurs"
 msgid "# of Lines"
 msgstr "# de lignes"
 
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Financial Details"
+msgstr "Détails Financier"
+
+
+
+
+
 #. module: purchase
 #. odoo-python
 #: code:addons/addons/purchase/models/purchase_order.py:0
