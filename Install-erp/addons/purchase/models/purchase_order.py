@@ -1211,23 +1211,38 @@ class PurchaseOrder(models.Model):
     # New fields and functions
     # DD Fields
     dd_amount = fields.Float(string="DD Amount")
-    dd_currency_id = fields.Many2one('res.currency', string="DD Currency")
+    dd_currency_id = fields.Many2one('res.currency', string="DD Currency", default=lambda self: self.currency_id.id)
     dd_amount_dinar = fields.Float(string="DD Amount in Dinar")
 
     # Transport Fields
     transport_amount = fields.Float(string="Transport Amount")
-    transport_currency_id = fields.Many2one('res.currency', string="Transport Currency")
+    transport_currency_id = fields.Many2one('res.currency', string="Transport Currency", default=lambda self: self.currency_id.id)
     transport_amount_dinar = fields.Float(string="Transport Amount in Dinar")
 
     # Transit Fields
     transit_amount = fields.Float(string="Transit Amount")
-    transit_currency_id = fields.Many2one('res.currency', string="Transit Currency")
+    transit_currency_id = fields.Many2one('res.currency', string="Transit Currency", default=lambda self: self.currency_id.id)
     transit_amount_dinar = fields.Float(string="Transit Amount in Dinar")
 
     # Cert Fields
     cert_amount = fields.Float(string="Cert Amount")
-    cert_currency_id = fields.Many2one('res.currency', string="Cert Currency")
+    cert_currency_id = fields.Many2one('res.currency', string="Cert Currency", default=lambda self: self.currency_id.id)
     cert_amount_dinar = fields.Float(string="Cert Amount in Dinar")
+
+    @api.onchange('currency_id')
+    def _onchange_currency_id(self):
+        # Set the currency for DD fields
+        self.dd_currency_id = self.currency_id
+
+        # Set the currency for Transport fields
+        self.transport_currency_id = self.currency_id
+
+        # Set the currency for Transit fields
+        self.transit_currency_id = self.currency_id
+
+        # Set the currency for Cert fields
+        self.cert_currency_id = self.currency_id
+
 
 
     # Total Amount of Amount dinars
