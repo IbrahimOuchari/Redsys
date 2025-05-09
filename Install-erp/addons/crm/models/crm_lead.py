@@ -2742,16 +2742,43 @@ class Lead(models.Model):
     string="Final Product Lines"
     )
 
+    # Helper function to handle the notification display and page reload
+    def notify_product_status(self, product_found):
+        if product_found:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+                'next': {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
+                    'title': "Success",
+                    'message': "The product already exists.",
+                    'type': 'success',
+                    'sticky': False,
+                }}  # Use 'next' to trigger reload
+            }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'reload',
+                'next': {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
+                    'title': "Success",
+                    'message': "A new product has been created.",
+                    'type': 'success',
+                    'sticky': False,
+                }}  # Use 'next' to trigger reload
+            }
+    # Main function to generate final product lines
     def action_generate_final_product_lines(self):
         for lead in self:
             final_lines = []
+            product_found = False  # Flag to track if any product is found
 
             for line in lead.initial_product_list_ids:
                 barcode = line.barcode
                 product = self.env['product.template'].search([('barcode', '=', barcode)], limit=1)
 
+                line_product_found = False  # Track if this specific line's product exists
                 if product:
-                    # Produit existant → remplir avec les infos du produit.template
+                    # Existing product - fill with info from product.template
                     final_lines.append((0, 0, {
                         'barcode': barcode,
                         'product_id': product.id,
@@ -2760,9 +2787,9 @@ class Lead(models.Model):
                         'uom_id': product.uom_id.id,
                         'unit_price': product.list_price,
                     }))
-                    self.final_product_list_generated = True
+                    line_product_found = True
                 else:
-                    # Produit inexistant → créer le produit dans product.template
+                    # Create new product in product.template
                     new_product = self.env['product.template'].create({
                         'name': line.name or f'New Product {barcode}',
                         'barcode': barcode,
@@ -2771,10 +2798,10 @@ class Lead(models.Model):
                         'type': 'product',  # Set default type, adjust if needed
                         'detailed_type': 'product',  # Ensure it is a storable product
                         'list_price': 0.0,  # Default price
-                        'description_purchase': line.description,  # Default price
+                        'description_purchase': line.description,
                     })
 
-                    # Utiliser le nouveau produit créé
+                    # Use the newly created product
                     final_lines.append((0, 0, {
                         'barcode': barcode,
                         'product_id': new_product.id,
@@ -2783,10 +2810,19 @@ class Lead(models.Model):
                         'uom_id': new_product.uom_id.id,
                         'unit_price': new_product.list_price,
                     }))
-                    self.final_product_list_generated = True
 
-            # Écrase les anciennes lignes finales
+                # Update the overall product_found flag if any product was found
+                if line_product_found:
+                    product_found = True
+
+            # Update the final product list
             lead.final_product_list_ids = [(5, 0, 0)] + final_lines
+            lead.final_product_list_generated = True  # Set this flag regardless
+
+            # Call the notification function with appropriate message
+            return self.notify_product_status(product_found)
+
+        return None
 
     def action_create_rfq(self):
         self.ensure_one()
