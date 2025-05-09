@@ -2755,7 +2755,7 @@ class Lead(models.Model):
                     final_lines.append((0, 0, {
                         'barcode': barcode,
                         'product_id': product.id,
-                        'description': product.description_sale,
+                        'description': line.description,
                         'quantity': line.quantity,
                         'uom_id': product.uom_id.id,
                         'unit_price': product.list_price,
@@ -2764,20 +2764,21 @@ class Lead(models.Model):
                 else:
                     # Produit inexistant → créer le produit dans product.template
                     new_product = self.env['product.template'].create({
-                        'name': line.description or f'New Product {barcode}',
+                        'name': line.name or f'New Product {barcode}',
                         'barcode': barcode,
                         'uom_id': line.unit_of_measure_id.id,
                         'uom_po_id': line.unit_of_measure_id.id,  # Using the same UOM for purchase
                         'type': 'product',  # Set default type, adjust if needed
                         'detailed_type': 'product',  # Ensure it is a storable product
                         'list_price': 0.0,  # Default price
+                        'description_purchase': line.description,  # Default price
                     })
 
                     # Utiliser le nouveau produit créé
                     final_lines.append((0, 0, {
                         'barcode': barcode,
                         'product_id': new_product.id,
-                        'description': new_product.description,
+                        'description': line.description,
                         'quantity': line.quantity,
                         'uom_id': new_product.uom_id.id,
                         'unit_price': new_product.list_price,
@@ -2813,7 +2814,7 @@ class Lead(models.Model):
                 'order_id': purchase_rfq.id,
                 'product_id': rfq_line.product_id.id,
                 'barcode': rfq_line.barcode,
-                'name': rfq_line.description,
+                'name': rfq_line.name,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
             })
@@ -3030,3 +3031,38 @@ class Lead(models.Model):
                 # Update prix_revient if found
                 if matching_final_line:
                     matching_final_line.prix_revient = estimation_line.prix_revient
+
+
+    purchase_order_count = fields.Integer(
+        string='Nombre de Commandes',
+    )
+
+
+
+    def action_view_purchase_rfq(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Purchase Order',
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'domain': [('crm_lead_id', '=', self.id)],
+            'context': {'default_crm_lead_id': self.id},
+        }
+
+    rfq_count = fields.Integer(
+        string="Nombre de RFQ",
+    )
+
+
+
+    def action_view_rfqs(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'RFQ',
+            'res_model': 'purchase.rfq',
+            'view_mode': 'form',
+            'domain': [('crm_lead_id', '=', self.id)],
+            'context': {'default_crm_lead_id': self.id},
+        }

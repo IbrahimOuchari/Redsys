@@ -9,7 +9,7 @@ class FinalProductList(models.Model):
         comodel_name='product.template',
         string="Product"
     )
-    description = fields.Text(related='product_id.description_sale',string="Description")
+    description = fields.Text(related='product_id.description_purchase',string="Description")
     quantity = fields.Float(string="Quantity", default=1.0)
     uom_id = fields.Many2one(
         comodel_name='uom.uom',

@@ -64,6 +64,27 @@
                                 <span class="o_stat_text" invisible="duplicate_lead_count &gt; 1">Similar Lead</span>
                             </div>
                         </button>
+                                                <field name="rfq_count" invisible="1"/>
+
+                        <button name="action_view_rfqs"
+                                type="object"
+                                string="View RFQ"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                invisible="rfq_count">
+
+                        </button>
+
+
+                        <field name="purchase_order_count" invisible="1"/>
+                        <button name="action_view_purchase_rfq"
+                                string="View Purchase Order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="purchase_order_count">
+
+                        </button>
                     </div>
                     <widget name="web_ribbon" title="Lost" bg_color="text-bg-danger"
                             invisible="probability &gt; 0 or active"/>
@@ -420,19 +441,19 @@
                             </field>
                         </page>
                         <page string="Estimation">
-                    <field name="estimation_line_ids">
-                        <tree editable="bottom">
-                            <field name="barcode"/>
-                            <field name="product_id"/>
-                            <field name="description"/>
-                            <field name="quantity"/>
-                            <field name="uom_id"/>
-                            <field name="price_proposed"/>
-                            <field name="total" readonly="1"/>
-                            <field name="sum_of_total" readonly="1"/>
-                        </tree>
-                    </field>
-                                                        <group string="Financial Details">
+                            <field name="estimation_line_ids">
+                                <tree editable="bottom">
+                                    <field name="barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="price_proposed"/>
+                                    <field name="total" readonly="1"/>
+                                    <field name="sum_of_total" readonly="1"/>
+                                </tree>
+                            </field>
+                            <group string="Financial Details">
                                 <group colspan="2">
                                     <div class="mb-3">
                                         <strong>DD</strong>
@@ -582,7 +603,7 @@
                             </group>
 
 
-                </page>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
