@@ -1255,77 +1255,62 @@ class PurchaseOrder(models.Model):
 
     @api.onchange('dd_amount', 'dd_currency_id')
     def _onchange_dd_fields(self):
-        if self.dd_amount:
+        if self.dd_amount and self.dd_currency_id:
             if self.dd_currency_id.name == 'TND':
                 # If currency is Dinar, dinar amount equals original amount
                 self.dd_amount_dinar = self.dd_amount
             else:
-                # If different currency, convert to Dinar using currency rate
+                # If different currency, convert to Dinar using the latest rate from rate_ids
                 rate = 1.0
-                if self.dd_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.dd_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
+                if self.dd_currency_id.rate_ids:
+                    # Get the most recent rate from the rate_ids field
+                    latest_rate = self.dd_currency_id.rate_ids.sorted('name', reverse=True)[0]
+                    rate = latest_rate.inverse_company_rate
                 self.dd_amount_dinar = self.dd_amount * rate
 
     @api.onchange('transport_amount', 'transport_currency_id')
     def _onchange_transport_fields(self):
-        if self.transport_amount:
+        if self.transport_amount and self.transport_currency_id:
             if self.transport_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
+                # If currency is Dinar, transport amount equals original amount
                 self.transport_amount_dinar = self.transport_amount
             else:
-                # If different currency, convert to Dinar using currency rate
+                # If different currency, convert to Dinar using the latest rate from rate_ids
                 rate = 1.0
-                if self.transport_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.transport_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
+                if self.transport_currency_id.rate_ids:
+                    # Get the most recent rate from the rate_ids field
+                    latest_rate = self.transport_currency_id.rate_ids.sorted('name', reverse=True)[0]
+                    rate = latest_rate.inverse_company_rate
                 self.transport_amount_dinar = self.transport_amount * rate
 
     @api.onchange('transit_amount', 'transit_currency_id')
     def _onchange_transit_fields(self):
-        if self.transit_amount:
+        if self.transit_amount and self.transit_currency_id:
             if self.transit_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
+                # If currency is Dinar, transit amount equals original amount
                 self.transit_amount_dinar = self.transit_amount
             else:
-                # If different currency, convert to Dinar using currency rate
+                # If different currency, convert to Dinar using the latest rate from rate_ids
                 rate = 1.0
-                if self.transit_currency_id:
-                    # Get the latest rate for the currency for the current company
-                    latest_rate = self.env['res.currency.rate'].search([
-                        ('currency_id', '=', self.transit_currency_id.id),
-                        ('company_id', '=', self.env.company.id)
-                    ], order='name desc', limit=1)
-
-                    if latest_rate:
-                        rate = latest_rate.rate
+                if self.transit_currency_id.rate_ids:
+                    # Get the most recent rate from the rate_ids field
+                    latest_rate = self.transit_currency_id.rate_ids.sorted('name', reverse=True)[0]
+                    rate = latest_rate.inverse_company_rate
                 self.transit_amount_dinar = self.transit_amount * rate
 
     @api.onchange('cert_amount', 'cert_currency_id')
     def _onchange_cert_fields(self):
-        if self.cert_amount:
+        if self.cert_amount and self.cert_currency_id:
             if self.cert_currency_id.name == 'TND':
-                # If currency is Dinar, dinar amount equals original amount
+                # If currency is Dinar, cert amount equals original amount
                 self.cert_amount_dinar = self.cert_amount
             else:
-                # If different currency, convert to Dinar using currency rate
+                # If different currency, convert to Dinar using the latest rate from rate_ids
                 rate = 1.0
-                if self.cert_currency_id and self.cert_currency_id.rate_ids:
-                    # Get the latest rate for the currency
+                if self.cert_currency_id.rate_ids:
+                    # Get the most recent rate from the rate_ids field
                     latest_rate = self.cert_currency_id.rate_ids.sorted('name', reverse=True)[0]
-                    rate = latest_rate.rate
+                    rate = latest_rate.inverse_company_rate
                 self.cert_amount_dinar = self.cert_amount * rate
 
     cost_by_product = fields.Float(
