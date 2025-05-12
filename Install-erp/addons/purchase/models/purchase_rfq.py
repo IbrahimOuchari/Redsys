@@ -326,7 +326,8 @@ class PurchaseRfq(models.Model):
 
     def action_rfq_send(self):
         '''
-        This function opens a window to compose an email, with the edi purchase template message loaded by default
+        This function opens a window to compose an email, with the EDI purchase template message loaded by default.
+        It fetches recipients from `suppliers_ids` instead of `partner_id`.
         '''
         self.ensure_one()
         ir_model_data = self.env['ir.model.data']
@@ -341,6 +342,8 @@ class PurchaseRfq(models.Model):
             compose_form_id = ir_model_data._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
+
+        # Build context
         ctx = dict(self.env.context or {})
         ctx.update({
             'default_model': 'purchase.rfq',
@@ -350,11 +353,11 @@ class PurchaseRfq(models.Model):
             'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
             'force_email': True,
             'mark_rfq_as_sent': True,
+            # ✨ Custom line to populate the recipients with suppliers_ids
+            'default_partner_ids': [(6, 0, self.suppliers_ids.ids)],
         })
 
-        # In the case of a RFQ or a PO, we want the "View..." button in line with the state of the
-        # object. Therefore, we pass the model description in the context, in the language in which
-        # the template is rendered.
+        # Handle language context
         lang = self.env.context.get('lang')
         if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
             template = self.env['mail.template'].browse(ctx['default_template_id'])
@@ -362,6 +365,8 @@ class PurchaseRfq(models.Model):
                 lang = template._render_lang([ctx['default_res_id']])[ctx['default_res_id']]
 
         self = self.with_context(lang=lang)
+
+        # Label according to state
         if self.state in ['draft', 'sent']:
             ctx['model_description'] = _('Request for Quotation')
         else:
@@ -377,7 +382,6 @@ class PurchaseRfq(models.Model):
             'target': 'new',
             'context': ctx,
         }
-
 
     # def print_quotation(self):
     #     self.write({'state': "sent"})
