@@ -635,17 +635,10 @@ class MailComposer(models.TransientModel):
     # ------------------------------------------------------------
 
     def action_send_mail(self):
-        # If multiple partners exist: send to each one separately
-        if len(self.partner_ids) > 1:
-            for partner in self.partner_ids:
-                new_wizard = self.with_context(partner_id=partner.id).copy({
-                    'partner_ids': [(6, 0, [partner.id])],
-                })
-                new_wizard._action_send_mail(auto_commit=False)
-            return {'type': 'ir.actions.act_window_close'}
-        else:
-            # fallback to default behavior for single partner
-            return super(MailComposer, self).action_send_mail()
+        """ Used for action button that do not accept arguments. """
+        self._action_send_mail(auto_commit=False)
+        return {'type': 'ir.actions.act_window_close'}
+
     def _action_send_mail(self, auto_commit=False):
         """ Process the wizard content and proceed with sending the related
             email(s), rendering any template patterns on the fly if needed.

@@ -2840,13 +2840,15 @@ class Lead(models.Model):
         purchase_rfq_vals = {
             'partner_id': self.partner_id.id,
             'crm_lead_id': self.id,
-            # Ajouter d'autres champs si nécessaire
+            # Ajoute ici les autres champs requis de purchase.rfq
         }
 
-        purchase_rfq = self.env['purchase.rfq'].create(purchase_rfq_vals)
+        purchase_rfq = self.env['purchase.rfq'].sudo().create(purchase_rfq_vals)
 
         for rfq_line in self.final_product_list_ids:
-            self.env['purchase.rfq.line'].create({
+            if not rfq_line.product_id:
+                raise UserError("Produit manquant dans une ligne.")
+            self.env['purchase.rfq.line'].sudo().create({
                 'order_id': purchase_rfq.id,
                 'product_id': rfq_line.product_id.id,
                 'barcode': rfq_line.barcode,
@@ -2855,17 +2857,18 @@ class Lead(models.Model):
                 'product_uom': rfq_line.uom_id.id,
             })
 
-        self.purchase_rfq_ids = [(4, purchase_rfq.id)]
+        # ➕ Si tu veux lier manuellement, assure-toi que c’est un Many2many
+        # Sinon ne fais rien ici, rely on the inverse field on purchase.rfq
+        # self.purchase_rfq_ids = [(4, purchase_rfq.id)]  # Supprimer ou corriger
+
         self.rfq_created = True
+
         return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': "Succès",
-                'message': "Le RFQ a été créé avec succès.",
-                'type': 'success',
-                'sticky': False,
-            }
+            'type': 'ir.actions.act_window',
+            'res_model': 'purchase.rfq',
+            'view_mode': 'form',
+            'res_id': purchase_rfq.id,
+            'target': 'current',
         }
 
     purchase_rfq_ids = fields.One2many(
@@ -2898,17 +2901,16 @@ class Lead(models.Model):
     @api.onchange('final_product_list_ids')
     def _onchange_copy_final_products_to_estimations(self):
         for lead in self:
-            lead.estimation_line_ids = [(5,0,0)]
+            lines = []
             for final_product in lead.final_product_list_ids:
-                self.env['crm.lead.estimation.line'].create({
-                    'lead_id': lead.id,
+                lines.append((0, 0, {
                     'product_id': final_product.product_id.id,
                     'barcode': final_product.barcode,
                     'quantity': final_product.quantity,
                     'uom_id': final_product.uom_id.id,
                     'price_proposed': final_product.unit_price,
-                })
-
+                }))
+            lead.estimation_line_ids = [(5, 0, 0)] + lines
 
     # this function will calculate the SUM OF FIELD total inside the esmtimation lines
     # @api.depends('estimation_line_ids')
@@ -3018,3 +3020,17 @@ class Lead(models.Model):
                     'type': 'warning',
                 }
             }
+
+    @api.onchange('final_product_list_ids')
+    def _onchange_copy_final_products_to_estimations(self):
+        for lead in self:
+            lines = []
+            for final_product in lead.final_product_list_ids:
+                lines.append((0, 0, {
+                    'product_id': final_product.product_id.id,
+                    'barcode': final_product.barcode,
+                    'quantity': final_product.quantity,
+                    'uom_id': final_product.uom_id.id,
+                    'price_proposed': final_product.unit_price,
+                }))
+            lead.estimation_line_ids = [(5, 0, 0)] + lines

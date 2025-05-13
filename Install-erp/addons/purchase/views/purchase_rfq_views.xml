@@ -97,10 +97,10 @@
                                    placeholder="Name, TIN, Email, or Reference"
                                    readonly="state in ['cancel', 'purchase']"
                                    options="{'no_create': True}"
-                                   required="state == 'sent'"
-                                   invisible="state != 'sent'"/>
+                                   required="state == 'rfq'"
+                                   invisible="state != 'rfq'"/>
                             >
-                            <field name="partner_ref"/>
+                            <field name="partner_ref"   invisible="state != 'rfq'"/>
 
                             <field name="id" invisible="1"/>
                             <field name="company_id" invisible="1" readonly="state in ['cancel', 'purchase']"/>

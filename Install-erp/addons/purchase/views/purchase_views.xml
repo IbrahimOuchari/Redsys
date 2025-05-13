@@ -512,13 +512,13 @@
                     <tbody>
                         <tr>
                             <td style="text-align: left; padding: 8px 12px;">
-                                <field name="dd_amount"/>
+                                <field name="dd_amount" style="min-width: 120px; width: 100%;"/>
                             </td>
                             <td style="text-align: center; padding: 8px 12px;">
                                 <field name="dd_currency_id" style="min-width: 120px; width: 100%;" options="{'no_create': True}"/>
                             </td>
                             <td style="text-align: right; padding: 8px 12px;">
-                                <field name="dd_amount_dinar"/>
+                                <field name="dd_amount_dinar" style="min-width: 120px; width: 100%;" readonly="1"/>
                             </td>
                         </tr>
                     </tbody>
@@ -540,13 +540,13 @@
                     <tbody>
                         <tr>
                             <td style="text-align: left; padding: 8px 12px;">
-                                <field name="transport_amount"/>
+                                <field name="transport_amount" style="min-width: 120px; width: 100%;"/>
                             </td>
                             <td style="text-align: center; padding: 8px 12px;">
                                 <field name="transport_currency_id" style="min-width: 120px; width: 100%;" options="{'no_create': True}"/>
                             </td>
                             <td style="text-align: right; padding: 8px 12px;">
-                                <field name="transport_amount_dinar"/>
+                                <field name="transport_amount_dinar" style="min-width: 120px; width: 100%;" readonly="1"/>
                             </td>
                         </tr>
                     </tbody>
@@ -568,13 +568,13 @@
                     <tbody>
                         <tr>
                             <td style="text-align: left; padding: 8px 12px;">
-                                <field name="transit_amount"/>
+                                <field name="transit_amount" style="min-width: 120px; width: 100%;"/>
                             </td>
                             <td style="text-align: center; padding: 8px 12px;">
                                 <field name="transit_currency_id" style="min-width: 120px; width: 100%;" options="{'no_create': True}"/>
                             </td>
                             <td style="text-align: right; padding: 8px 12px;">
-                                <field name="transit_amount_dinar"/>
+                                <field name="transit_amount_dinar" style="min-width: 120px; width: 100%;" readonly="1"/>
                             </td>
                         </tr>
                     </tbody>
@@ -596,13 +596,13 @@
                     <tbody>
                         <tr>
                             <td style="text-align: left; padding: 8px 12px;">
-                                <field name="cert_amount"/>
+                                <field name="cert_amount" style="min-width: 120px; width: 100%;"/>
                             </td>
                             <td style="text-align: center; padding: 8px 12px;">
                                 <field name="cert_currency_id" style="min-width: 120px; width: 100%;" options="{'no_create': True}"/>
                             </td>
                             <td style="text-align: right; padding: 8px 12px;">
-                                <field name="cert_amount_dinar"/>
+                                <field name="cert_amount_dinar" style="min-width: 120px; width: 100%;" readonly="1"/>
                             </td>
                         </tr>
                     </tbody>
@@ -627,10 +627,10 @@
                     <tbody>
                         <tr>
                             <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">
-                                <field name="cost_by_product"/>
+                                <field name="cost_by_product" style="min-width: 120px; width: 100%;"/>
                             </td>
                             <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
-                                <field name="total_amount_dinar"/>
+                                <field name="total_amount_dinar" style="min-width: 120px; width: 100%;"/>
                             </td>
                         </tr>
                     </tbody>
