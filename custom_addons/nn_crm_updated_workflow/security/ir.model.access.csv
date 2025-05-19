@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_crm_initial_product_list_user,access.crm.initial.product.list.user,model_crm_initial_product_list,base.group_user,1,1,1,1
+access_crm_final_product_list_user,access.crm.final.product.list.user,model_crm_final_product_list,base.group_user,1,1,1,1
+
+
+access_crm_lead_estimation_line,access.crm.lead.estimation.line,model_crm_lead_estimation_line,,1,1,1,1
+

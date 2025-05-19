@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_purchase_order_cost_line,purchase.order.cost.line,model_purchase_order_cost_line,,1,1,1,1
+
+

@@ -391,6 +391,3 @@ class PurchaseRFQLine(models.Model):
         return {
             "order_id": self.order_id,
         }
-
-    # New fields and functions
-    barcode = fields.Char(string="PN",related='product_id.barcode')

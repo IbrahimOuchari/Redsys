@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_purchase_rfq_form_inherit_custom" model="ir.ui.view">
+        <field name="name">purchase.rfq.form.inherit.custom</field>
+        <field name="model">purchase.rfq</field>
+        <field name="inherit_id" ref="purchase.purchase_rfq_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Exemple : Ajouter un champ après le champ name -->
+            <xapth expr="//sheet/div/" position="inside">
+                <field name="crm_lead_id" invisible="1"/>
+
+
+            </xapth>
+            <xpath expr="//notebook/page[name='products']/field[name='order_line']/tree/field[name='date_planned']"
+                   position="after">
+                <field name="barcode" string="PN"/>
+
+
+            </xpath>
+        </field>
+    </record>
+</odoo>

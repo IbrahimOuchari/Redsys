@@ -16,6 +16,4 @@ from . import crm_lead_scoring_frequency
 from . import utm
 from . import crm_recurring_plan
 from . import mail_activity
-from . import crm_initial_product_list
-from . import crm_final_product_list
-from . import crm_lead_estimation_line
+

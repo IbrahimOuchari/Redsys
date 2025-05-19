@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_crm_lead_form_inherit_custom" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit.custom</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Exemple : Ajouter un champ après le champ name -->
+            <xapth expr="//header" position="inside">
+                <button name="action_create_rfq"
+                        type="object"
+                        string="Create RFQ"
+                        class="btn-primary"
+                        invisible="not final_product_list_generated or rfq_created"
+                />
+                 <button name="action_generate_final_product_lines"
+                            type="object"
+                            string="Generate the final products list"
+                            class="btn-primary"
+                            invisible="final_product_list_generated"
+                    />
+                                            <field name="rfq_created" invisible="1"/>
+
+
+                    <field name="final_product_list_generated" invisible="1"/>
+                    <field name="purchase_rfq_ids" invisible="1"/>
+                    <field name="purchase_order_ids" invisible="1"/>
+            </xapth>
+            <xpath expr="//sheet/div/button" position="after">
+                                            <field name="rfq_created" invisible="1"/>
+
+                        <button name="action_view_rfqs"
+                                type="object"
+                                string="View RFQ"
+                                class="oe_stat_button"
+                                icon="fa-file-text-o"
+                                invisible="not rfq_created">
+
+                        </button>
+
+
+                        <field name="purchase_order_created" invisible="1"/>
+                        <button name="action_view_purchase_rfq"
+                                string="View Purchase Order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="not purchase_order_created">
+
+                        </button>
+            </xpath>
+<xpath expr="//notebook/page" position="inside">
+     <page name="initial_product_list" string="Initial Product List"
+                              invisible="final_product_list_generated">
+                            <field name="initial_product_list_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="barcode"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_of_measure_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="final_product_list" string="Final Product List"
+                              invisible="not final_product_list_generated">
+                            <field name="final_product_list_ids">
+                                <tree editable="bottom">
+                                    <field name="barcode" string="PN"/>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_price"/>
+                                </tree>
+                            </field>
+                        </page>
+
+
+                        <page string="Lignes de coût" invisible="not purchase_order_created">
+                            <field name="cost_line_ids">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="barcode"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="purchase_price"/>
+                                    <field name="prix_de_revient"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Estimation" invisible="not purchase_order_created">
+                            <field name="estimation_line_ids">
+                                <tree editable="bottom">
+                                    <field name="barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="price_proposed"/>
+                                    <field name="total" readonly="1"/>
+                                    <field name="sum_of_total" readonly="1"/>
+                                </tree>
+                            </field>
+                            <group string="Financial Details">
+                                <group colspan="2">
+                                    <div class="mb-3">
+                                        <strong>DD</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                                    <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                                    <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left; padding: 8px 12px;">
+                                                        <field name="dd_amount"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 8px 12px;">
+                                                        <field name="dd_currency_id"
+                                                               style="min-width: 120px; width: 100%;"
+                                                               options="{'no_create': True}"/>
+                                                    </td>
+                                                    <td style="text-align: right; padding: 8px 12px;">
+                                                        <field name="dd_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </group>
+
+                                <group colspan="2">
+                                    <div class="mb-3">
+                                        <strong>Transport</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                                    <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                                    <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left; padding: 8px 12px;">
+                                                        <field name="transport_amount"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 8px 12px;">
+                                                        <field name="transport_currency_id"
+                                                               style="min-width: 120px; width: 100%;"
+                                                               options="{'no_create': True}"/>
+                                                    </td>
+                                                    <td style="text-align: right; padding: 8px 12px;">
+                                                        <field name="transport_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </group>
+
+                                <group colspan="2">
+                                    <div class="mb-3">
+                                        <strong>Transit</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                                    <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                                    <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left; padding: 8px 12px;">
+                                                        <field name="transit_amount"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 8px 12px;">
+                                                        <field name="transit_currency_id"
+                                                               style="min-width: 120px; width: 100%;"
+                                                               options="{'no_create': True}"/>
+                                                    </td>
+                                                    <td style="text-align: right; padding: 8px 12px;">
+                                                        <field name="transit_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </group>
+
+                                <group colspan="2">
+                                    <div class="mb-3">
+                                        <strong>Certificate</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                                    <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                                    <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left; padding: 8px 12px;">
+                                                        <field name="cert_amount"/>
+                                                    </td>
+                                                    <td style="text-align: center; padding: 8px 12px;">
+                                                        <field name="cert_currency_id"
+                                                               style="min-width: 120px; width: 100%;"
+                                                               options="{'no_create': True}"/>
+                                                    </td>
+                                                    <td style="text-align: right; padding: 8px 12px;">
+                                                        <field name="cert_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </group>
+
+                                <group>
+                                    <div class="mb-3">
+                                        <strong>Additional Cost Allocation</strong>
+                                        <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align: left; font-size: 1.2em; padding: 8px 12px;">
+                                                        Cost by Product
+                                                    </th>
+                                                    <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
+                                                        Total Amount (Dinar)
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">
+                                                        <field name="cost_by_product"/>
+                                                    </td>
+                                                    <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
+                                                        <field name="total_amount_dinar"/>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </group>
+                            </group>
+
+
+                        </page>
+
+</xpath>
+        </field>
+    </record>
+</odoo>

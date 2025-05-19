@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_purchase_order_form_inherit_custom" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+
+            <path expr="//sheet " position="inside">
+                <field name="crm_lead_id" invisible="1"/>
+
+
+            </path>
+
+
+            <!-- Insérer un champ après partner_id -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Fees">
+                    <group string="Financial Details">
+                        <group colspan="2">
+                            <div class="mb-3">
+                                <strong>DD</strong>
+                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; padding: 8px 12px;">
+                                                <field name="dd_amount" style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                            <td style="text-align: center; padding: 8px 12px;">
+                                                <field name="dd_currency_id" style="min-width: 120px; width: 100%;"
+                                                       options="{'no_create': True}"/>
+                                            </td>
+                                            <td style="text-align: right; padding: 8px 12px;">
+                                                <field name="dd_amount_dinar" style="min-width: 120px; width: 100%;"
+                                                       readonly="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+
+                        <group colspan="2">
+                            <div class="mb-3">
+                                <strong>Transport</strong>
+                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; padding: 8px 12px;">
+                                                <field name="transport_amount" style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                            <td style="text-align: center; padding: 8px 12px;">
+                                                <field name="transport_currency_id"
+                                                       style="min-width: 120px; width: 100%;"
+                                                       options="{'no_create': True}"/>
+                                            </td>
+                                            <td style="text-align: right; padding: 8px 12px;">
+                                                <field name="transport_amount_dinar"
+                                                       style="min-width: 120px; width: 100%;" readonly="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+
+                        <group colspan="2">
+                            <div class="mb-3">
+                                <strong>Transit</strong>
+                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; padding: 8px 12px;">
+                                                <field name="transit_amount" style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                            <td style="text-align: center; padding: 8px 12px;">
+                                                <field name="transit_currency_id" style="min-width: 120px; width: 100%;"
+                                                       options="{'no_create': True}"/>
+                                            </td>
+                                            <td style="text-align: right; padding: 8px 12px;">
+                                                <field name="transit_amount_dinar"
+                                                       style="min-width: 120px; width: 100%;" readonly="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+
+                        <group colspan="2">
+                            <div class="mb-3">
+                                <strong>Certificate</strong>
+                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
+                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
+                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; padding: 8px 12px;">
+                                                <field name="cert_amount" style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                            <td style="text-align: center; padding: 8px 12px;">
+                                                <field name="cert_currency_id" style="min-width: 120px; width: 100%;"
+                                                       options="{'no_create': True}"/>
+                                            </td>
+                                            <td style="text-align: right; padding: 8px 12px;">
+                                                <field name="cert_amount_dinar" style="min-width: 120px; width: 100%;"
+                                                       readonly="1"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+
+                        <group>
+                            <div class="mb-3">
+                                <strong>Additional Cost Allocation</strong>
+                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; font-size: 1.2em; padding: 8px 12px;">
+                                                Cost by Product
+                                            </th>
+                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
+                                                Total Amount (Dinar)
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">
+                                                <field name="cost_by_product" style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
+                                                <field name="total_amount_dinar"
+                                                       style="min-width: 120px; width: 100%;"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+                <page string="Cost Price">
+                    <field name="cost_line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="barcode"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="uom_id"/>
+                            <field name="purchase_price"/>
+                            <field name="cost_by_product"/>
+                            <field name="prix_de_revient"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

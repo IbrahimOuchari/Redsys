@@ -809,27 +809,9 @@ class PurchaseRfq(models.Model):
             })
 
 
-    # new fields and function
+#         The new suppliers_ids field
     suppliers_ids = fields.Many2many(
         'res.partner',
         string="Tous les Fournisseurs",
         domain=[('is_supplier', '=', True)]
     )
-    # crm_lead_id = fields.Many2one(
-    #     'crm.lead',
-    #     string="Piste CRM",
-    #     help="Piste CRM liée à cette commande d'achat"
-    # )
-
-    @api.onchange('suppliers_ids')
-    def _onchange_suppliers_ids(self):
-        for record in self:
-            record.partner_id = False
-
-
-    crm_lead_id = fields.Many2one(
-        'crm.lead',
-        string="CRM Lead",
-        help="Related CRM opportunity or lead"
-    )
-
