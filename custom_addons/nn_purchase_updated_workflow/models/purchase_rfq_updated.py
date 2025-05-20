@@ -1,4 +1,4 @@
-from odoo import fields,api , models
+from odoo import fields,api , models,_
 from odoo.exceptions import UserError, ValidationError
 
 import logging
@@ -101,6 +101,7 @@ class PurchaseRFQUpdatedWorkflow(models.Model):
                 'product_id': line.product_id.id,
                 'name': line.name,
                 'product_qty': line.product_qty,
+                'price_unit': line.price_unit,
             }) for line in self.order_line],
         })
         # Store the relation to the newly created PO
