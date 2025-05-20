@@ -25,3 +25,8 @@ class FinalProductList(models.Model):
     prix_revient = fields.Float(
         string="Prix de Revient", store=True
     )
+    detailed_type = fields.Selection(
+        related='product_id.detailed_type',
+        string="Product Type",
+        store=True
+    )

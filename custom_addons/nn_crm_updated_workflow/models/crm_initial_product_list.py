@@ -28,9 +28,10 @@ class InitialProductList(models.Model):
              'A consumable product is a product for which stock is not managed.\n'
              'A service is a non-material product you provide.')
 
-    taux_tva = fields.Float(
-        string="Taux TVA (%)",
-        help="Taux de la taxe sur la valeur ajoutée appliqué à ce produit."
+    taux_tva = fields.Many2many(
+        comodel_name='account.tax',
+        string="Taxes",
+        help="Taxes that apply on the product sale"
     )
 
     @api.model

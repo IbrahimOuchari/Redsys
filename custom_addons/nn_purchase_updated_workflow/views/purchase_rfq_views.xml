@@ -7,17 +7,25 @@
         <field name="arch" type="xml">
 
             <!-- Exemple : Ajouter un champ après le champ name -->
-            <xapth expr="//sheet/div/" position="inside">
+            <xpath expr="//sheet" position="inside">
                 <field name="crm_lead_id" invisible="1"/>
 
 
-            </xapth>
-            <xpath expr="//notebook/page[name='products']/field[name='order_line']/tree/field[name='date_planned']"
-                   position="after">
+            </xpath>
+
+
+<xpath expr="//field[@name='order_line']/tree//field[@name='date_planned']" position="after">
                 <field name="barcode" string="PN"/>
+            </xpath>
+
+
+<xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
+                <field name="price_unit" string="Unit Price"/>
 
 
             </xpath>
+
+
         </field>
     </record>
 </odoo>

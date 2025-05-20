@@ -6,7 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class PurchaseOrderUpdated(models.Model):
-    inherit = 'purchase.order'
+    _inherit = 'purchase.order'
     # New fields and functions
 
     # New fields and functions

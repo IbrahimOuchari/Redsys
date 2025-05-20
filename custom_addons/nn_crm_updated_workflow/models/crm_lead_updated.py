@@ -73,9 +73,10 @@ class CrmUpdatedWorkflow(models.Model):
                         'name': line.name or f'New Product {barcode}',
                         'barcode': barcode,
                         'uom_id': line.unit_of_measure_id.id,
+                        'taxes_id': [(6,0,line.taux_tva.ids)],
                         'uom_po_id': line.unit_of_measure_id.id,  # Using the same UOM for purchase
-                        'type': 'product',  # Set default type, adjust if needed
-                        'detailed_type': 'product',  # Ensure it is a storable product
+                        'type': line.detailed_type,  # Set default type, adjust if needed
+                        'detailed_type': line.detailed_type,  # Ensure it is a storable product
                         'list_price': 0.0,  # Default price
                         'description_purchase': line.description,
                     })
@@ -155,6 +156,7 @@ class CrmUpdatedWorkflow(models.Model):
         'crm_lead_id',
         string="Purchase Orders"
     )
+    order_line = fields.One2many(related='purchase_rfq_ids.order_line', string='RFQ Lines', copy=True)
     purchase_order_ids = fields.One2many(
         'purchase.order',
         'crm_lead_id',
@@ -163,12 +165,10 @@ class CrmUpdatedWorkflow(models.Model):
 
 
     # Related fields of Cost Price Purchase Price
-    cost_line_ids = fields.One2many('crm.lead.cost.line','crm_lead_id',compute = '_compute_cost_line_ids',string="Cost Lines",store= False)
+    cost_line_ids = fields.One2many('crm.lead.cost.line','crm_lead_id',string="Cost Lines",store= False)
 
 
-    def _compute_cost_line_ids(self):
-        for lead in self:
-            lead.cost_line_ids = lead.purchase_order_ids.cost_line_ids
+
 
     estimation_line_ids = fields.One2many(
         'crm.lead.estimation.line',

@@ -11,7 +11,7 @@ Ce module met à jour les vues personnalisées et le workflow du module d'Achat.
     'depends': ['purchase','base'],
     'data': [
         'views/purchase_order_views.xml',
-        'views/purchase_rfq_views.xml.xml',
+        'views/purchase_rfq_views.xml',
     ],
     'assets': {},
     'installable': True,

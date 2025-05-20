@@ -5,7 +5,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 class PurchaseRFQUpdatedWorkflow(models.Model):
-    inherit = 'purchase.rfq'
+    _inherit = 'purchase.rfq'
     # new fields and function
     suppliers_ids = fields.Many2many(
         'res.partner',
