@@ -130,11 +130,12 @@ class CrmUpdatedWorkflow(models.Model):
                 raise UserError("Produit manquant dans une ligne.")
             self.env['purchase.rfq.line'].sudo().create({
                 'order_id': purchase_rfq.id,
-                'product_id': rfq_line.product_id.id,
+                'product_id': rfq_line.product_id.product_variant_id.id,
                 'barcode': rfq_line.barcode,
                 'name': rfq_line.description,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
+                'price_unit': rfq_line.price_unit or 0.0,
             })
 
         # ➕ Si tu veux lier manuellement, assure-toi que c’est un Many2many
@@ -228,8 +229,38 @@ class CrmUpdatedWorkflow(models.Model):
     total_amount_dinar = fields.Float( string="Total Amount in Dinar",
                                       store=True)
     cost_by_product = fields.Float( string="Cost by product", store=True)
+    logistic_cost  = fields.Float(string='Logistic Cost',compute='_compute_logistic_cost')
+
+    @api.onchange('transport_amount_dinar','transit_amount_dinar')
+    def _compute_logtistic_cost(self):
+        for record in self:
+            record.logistic_cost = (record.transport_amount_dinar +  record.transit_amount_dinar)/ record.sum_quantity
 
 
+    sum_quantity = fields.Float(
+        string="Sum Quantity",
+        compute="_compute_sum_quantity",
+        store=True,
+    )
+
+    transport_cost = fields.Float(string='Transport Cost', compute='_compute_transport_cost')
+
+    @api.onchange('total_amount_dinar','sum_quantity')
+    def _compute_transport_cost(self):
+        for record in self:
+            if record.sum_quantity >0:
+               record.transport_cost = record.total_amount_dinar/ record.sum_quantity or 0.0
+            else:
+                record.transport_cost = 0
+
+    @api.depends('purchase_order_ids', 'purchase_order_ids.order_line', 'purchase_order_ids.order_line.product_qty')
+    def _compute_sum_quantity(self):
+        for record in self:
+            total_qty = 0.0
+            for order in record.purchase_order_ids:
+                for line in order.order_line:
+                    total_qty += line.product_qty
+            record.sum_quantity = total_qty
 
     @api.depends('final_product_list_ids.prix_revient')
     def _onchange_prix_revient(self):
@@ -310,6 +341,6 @@ class CrmUpdatedWorkflow(models.Model):
                     'barcode': final_product.barcode,
                     'quantity': final_product.quantity,
                     'uom_id': final_product.uom_id.id,
-                    'price_proposed': final_product.unit_price,
+                    'price_proposed': final_product.price_unit,
                 }))
             lead.estimation_line_ids = [(5, 0, 0)] + lines

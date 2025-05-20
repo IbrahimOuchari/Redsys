@@ -8,7 +8,7 @@ Ce module met à jour les vues personnalisées et le workflow du module CRM.
     """,
     'author': 'Neonara',
     'website': 'https://neonara.digital',
-    'depends': ['crm'],
+    'depends': ['crm','purchase'],
     'data': [
         'security/ir.model.access.csv',
         'views/crm_lead_views.xml',

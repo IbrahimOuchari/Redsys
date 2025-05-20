@@ -16,7 +16,7 @@ class FinalProductList(models.Model):
         string="Unit of Measure",
         ondelete='restrict'
     )
-    unit_price = fields.Float(string="Unit Price")
+    price_unit = fields.Float(string="Unit Price")
     lead_id = fields.Many2one(
         comodel_name='crm.lead',
         string="CRM Lead",

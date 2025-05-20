@@ -75,7 +75,7 @@
                             <field name="description"/>
                             <field name="quantity"/>
                             <field name="uom_id"/>
-                            <field name="unit_price"/>
+                            <field name="price_unit"/>
                         </tree>
                     </field>
                 </page>
@@ -108,36 +108,7 @@
                         </tree>
                     </field>
                     <group string="Financial Details">
-                        <group colspan="2">
-                            <div class="mb-3">
-                                <strong>DD</strong>
-                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
-                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
-                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="text-align: left; padding: 8px 12px;">
-                                                <field name="dd_amount"/>
-                                            </td>
-                                            <td style="text-align: center; padding: 8px 12px;">
-                                                <field name="dd_currency_id"
-                                                       style="min-width: 120px; width: 100%;"
-                                                       options="{'no_create': True}"/>
-                                            </td>
-                                            <td style="text-align: right; padding: 8px 12px;">
-                                                <field name="dd_amount_dinar"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
+
 
                         <group colspan="2">
                             <div class="mb-3">
@@ -201,38 +172,9 @@
                             </div>
                         </group>
 
-                        <group colspan="2">
-                            <div class="mb-3">
-                                <strong>Certificate</strong>
-                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
-                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
-                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="text-align: left; padding: 8px 12px;">
-                                                <field name="cert_amount"/>
-                                            </td>
-                                            <td style="text-align: center; padding: 8px 12px;">
-                                                <field name="cert_currency_id"
-                                                       style="min-width: 120px; width: 100%;"
-                                                       options="{'no_create': True}"/>
-                                            </td>
-                                            <td style="text-align: right; padding: 8px 12px;">
-                                                <field name="cert_amount_dinar"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
 
                         <group>
+                            <field name="sum_quantity" invisible="1"/>
                             <div class="mb-3">
                                 <strong>Additional Cost Allocation</strong>
                                 <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
@@ -244,6 +186,9 @@
                                             <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
                                                 Total Amount (Dinar)
                                             </th>
+                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
+                                                Transport Cost (Dinar)
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -253,6 +198,9 @@
                                             </td>
                                             <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
                                                 <field name="total_amount_dinar"/>
+                                            </td>
+                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
+                                                <field name="transport_cost"/>
                                             </td>
                                         </tr>
                                     </tbody>
