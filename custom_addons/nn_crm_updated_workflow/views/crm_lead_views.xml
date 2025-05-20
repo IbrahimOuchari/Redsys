@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
 
             <!-- Exemple : Ajouter un champ après le champ name -->
-            <xapth expr="//header" position="inside">
+            <xpath expr="//header" position="inside">
                 <button name="action_create_rfq"
                         type="object"
                         string="Create RFQ"
@@ -26,7 +26,7 @@
                     <field name="final_product_list_generated" invisible="1"/>
                     <field name="purchase_rfq_ids" invisible="1"/>
                     <field name="purchase_order_ids" invisible="1"/>
-            </xapth>
+            </xpath>
             <xpath expr="//sheet/div/button" position="after">
                                             <field name="rfq_created" invisible="1"/>
 
@@ -50,15 +50,17 @@
 
                         </button>
             </xpath>
-<xpath expr="//notebook/page" position="inside">
+<xpath expr="//notebook" position="inside">
      <page name="initial_product_list" string="Initial Product List"
                               invisible="final_product_list_generated">
                             <field name="initial_product_list_ids">
                                 <tree editable="bottom">
                                     <field name="name"/>
+                                    <field name="detailed_type"/>
                                     <field name="barcode"/>
                                     <field name="description"/>
                                     <field name="quantity"/>
+                                    <field name="taux_tva"/>
                                     <field name="unit_of_measure_id"/>
                                 </tree>
                             </field>

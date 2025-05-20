@@ -6,10 +6,14 @@ import logging
 _logger = logging.getLogger(__name__)
 
 class PurchaseOrderCostLine(models.Model):
-    _name = 'purchase.order.cost.line'
+    _name = 'crm.lead.cost.line'
     _description = 'Cost Price Line'
 
-
+    crm_lead_id = fields.Many2one(
+        'crm.lead',
+        string="CRM Lead",
+        help="Related CRM opportunity or lead"
+    )
     product_id = fields.Many2one('product.product', string='Product', required=True)
     barcode = fields.Char(string='PN', related='product_id.barcode', store=True)
     description = fields.Text(string='Description')
@@ -19,7 +23,7 @@ class PurchaseOrderCostLine(models.Model):
     cost_by_product = fields.Float(
         string="Cost by product",
         store=True,
-        related= 'order_id.cost_by_product'
+        related= 'crm_lead_id.cost_by_product'
     )
 
 

@@ -163,7 +163,7 @@ class CrmUpdatedWorkflow(models.Model):
 
 
     # Related fields of Cost Price Purchase Price
-    cost_line_ids = fields.One2many('purchase.order.cost.line','order_id',compute = '_compute_cost_line_ids',string="Cost Lines",store= False)
+    cost_line_ids = fields.One2many('crm.lead.cost.line','crm_lead_id',compute = '_compute_cost_line_ids',string="Cost Lines",store= False)
 
 
     def _compute_cost_line_ids(self):
@@ -200,34 +200,34 @@ class CrmUpdatedWorkflow(models.Model):
 
     # EXTRA FIELD dd cert trnasport transit
     # DD Fields
-    dd_amount = fields.Float(related='purchase_order_ids.dd_amount', string="DD Amount", store=True)
-    dd_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.dd_currency_id', string="DD Currency",
+    dd_amount = fields.Float( string="DD Amount", store=True)
+    dd_currency_id = fields.Many2one('res.currency',  string="DD Currency",
                                      store=True)
-    dd_amount_dinar = fields.Float(related='purchase_order_ids.dd_amount_dinar', string="DD Amount in Dinar",
+    dd_amount_dinar = fields.Float( string="DD Amount in Dinar",
                                    store=True)
 
-    transport_amount = fields.Float(related='purchase_order_ids.transport_amount', string="Transport Amount",
+    transport_amount = fields.Float(string="Transport Amount",
                                     store=True)
-    transport_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.transport_currency_id',
+    transport_currency_id = fields.Many2one('res.currency',
                                             string="Transport Currency", store=True)
-    transport_amount_dinar = fields.Float(related='purchase_order_ids.transport_amount_dinar',
+    transport_amount_dinar = fields.Float(
                                           string="Transport Amount in Dinar", store=True)
 
-    transit_amount = fields.Float(related='purchase_order_ids.transit_amount', string="Transit Amount", store=True)
-    transit_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.transit_currency_id',
+    transit_amount = fields.Float(string="Transit Amount", store=True)
+    transit_currency_id = fields.Many2one('res.currency',
                                           string="Transit Currency", store=True)
-    transit_amount_dinar = fields.Float(related='purchase_order_ids.transit_amount_dinar',
+    transit_amount_dinar = fields.Float(
                                         string="Transit Amount in Dinar", store=True)
 
-    cert_amount = fields.Float(related='purchase_order_ids.cert_amount', string="Cert Amount", store=True)
-    cert_currency_id = fields.Many2one('res.currency', related='purchase_order_ids.cert_currency_id',
+    cert_amount = fields.Float( string="Cert Amount", store=True)
+    cert_currency_id = fields.Many2one('res.currency',
                                        string="Cert Currency", store=True)
-    cert_amount_dinar = fields.Float(related='purchase_order_ids.cert_amount_dinar', string="Cert Amount in Dinar",
+    cert_amount_dinar = fields.Float( string="Cert Amount in Dinar",
                                      store=True)
 
-    total_amount_dinar = fields.Float(related='purchase_order_ids.total_amount_dinar', string="Total Amount in Dinar",
+    total_amount_dinar = fields.Float( string="Total Amount in Dinar",
                                       store=True)
-    cost_by_product = fields.Float(related='purchase_order_ids.cost_by_product', string="Cost by product", store=True)
+    cost_by_product = fields.Float( string="Cost by product", store=True)
 
 
 

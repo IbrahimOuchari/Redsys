@@ -19,6 +19,19 @@ class InitialProductList(models.Model):
         string="CRM Lead",
         ondelete='cascade'
     )
+    detailed_type = fields.Selection([
+        ('consu', 'Consumable'),
+        ('service', 'Service'),
+        ('product', 'Storable Product')
+    ], string='Product Type', default='consu', required=True,
+        help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
+             'A consumable product is a product for which stock is not managed.\n'
+             'A service is a non-material product you provide.')
+
+    taux_tva = fields.Float(
+        string="Taux TVA (%)",
+        help="Taux de la taxe sur la valeur ajoutée appliqué à ce produit."
+    )
 
     @api.model
     def default_get(self, fields_list):
