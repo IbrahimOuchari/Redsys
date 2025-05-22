@@ -64,7 +64,7 @@ class CrmUpdatedWorkflow(models.Model):
                         'description': line.description,
                         'quantity': line.quantity,
                         'uom_id': product.uom_id.id,
-                        'unit_price': product.list_price,
+                        'price_unit': product.list_price,
                     }))
                     line_product_found = True
                 else:
@@ -88,7 +88,7 @@ class CrmUpdatedWorkflow(models.Model):
                         'description': line.description,
                         'quantity': line.quantity,
                         'uom_id': new_product.uom_id.id,
-                        'unit_price': new_product.list_price,
+                        'price_unit': new_product.list_price,
                     }))
 
                 # Update the overall product_found flag if any product was found
@@ -166,8 +166,14 @@ class CrmUpdatedWorkflow(models.Model):
 
 
     # Related fields of Cost Price Purchase Price
-    cost_line_ids = fields.One2many('crm.lead.cost.line','crm_lead_id',string="Cost Lines",store= False)
-
+    cost_line_ids = fields.One2many(
+        'crm.lead.cost.line',
+        'crm_lead_id',
+        string="Cost Lines",
+        compute='_compute_copy_to_cost_line',
+        store=True , # Change to True if you want to store the values
+        readonly=False
+    )
 
 
 
@@ -177,20 +183,7 @@ class CrmUpdatedWorkflow(models.Model):
         string="Estimations"
     )
 
-    # this function will copy the lines from final product list to emtimation
-    @api.onchange('final_product_list_ids')
-    def _onchange_copy_final_products_to_estimations(self):
-        for lead in self:
-            lines = []
-            for final_product in lead.final_product_list_ids:
-                lines.append((0, 0, {
-                    'product_id': final_product.product_id.id,
-                    'barcode': final_product.barcode,
-                    'quantity': final_product.quantity,
-                    'uom_id': final_product.uom_id.id,
-                    'price_proposed': final_product.unit_price,
-                }))
-            lead.estimation_line_ids = [(5, 0, 0)] + lines
+
 
     # this function will calculate the SUM OF FIELD total inside the esmtimation lines
     # @api.depends('estimation_line_ids')
@@ -230,11 +223,82 @@ class CrmUpdatedWorkflow(models.Model):
                                       store=True)
     cost_by_product = fields.Float( string="Cost by product", store=True)
     logistic_cost  = fields.Float(string='Logistic Cost',compute='_compute_logistic_cost')
-
     @api.onchange('transport_amount_dinar','transit_amount_dinar')
-    def _compute_logtistic_cost(self):
+    def _compute_logistic_cost(self):
         for record in self:
-            record.logistic_cost = (record.transport_amount_dinar +  record.transit_amount_dinar)/ record.sum_quantity
+            if record.sum_quantity:
+               record.logistic_cost = (record.transport_amount_dinar +  record.transit_amount_dinar)/ record.sum_quantity
+            else:
+                record.logistic_cost = 0.0
+
+    currency_id = fields.Many2one(
+        'res.currency',
+        string="Devise",
+        default=lambda self: self.env.company.currency_id.id,
+        store=True,
+    )
+
+    @api.onchange('currency_id')
+    def _compute_currency_change(self):
+        for record in self:
+            if record.currency_id :
+                record.transit_currency_id = record.currency_id
+                record.transport_currency_id = record.currency_id
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        # Default currency_id from company
+        if 'currency_id' in fields_list:
+            res['currency_id'] = self.env.company.currency_id.id
+
+        # Default transit_currency_id from currency_id
+        if 'transit_currency_id' in fields_list:
+            res['transit_currency_id'] = res.get('currency_id', self.env.company.currency_id.id)
+
+        return res
+
+
+    @api.onchange('transport_amount', 'transport_currency_id')
+    def _onchange_transport_fields(self):
+        if self.transport_amount:
+            if self.transport_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.transport_amount_dinar = self.transport_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.transport_currency_id:
+                    # Get the latest rate for the currency for the current company
+                    latest_rate = self.env['res.currency.rate'].search([
+                        ('currency_id', '=', self.transport_currency_id.id),
+                        ('company_id', '=', self.env.company.id)
+                    ], order='name desc', limit=1)
+
+                    if latest_rate:
+                        rate = latest_rate.rate
+                self.transport_amount_dinar = self.transport_amount * rate
+
+    @api.onchange('transit_amount', 'transit_currency_id')
+    def _onchange_transit_fields(self):
+        if self.transit_amount:
+            if self.transit_currency_id.name == 'TND':
+                # If currency is Dinar, dinar amount equals original amount
+                self.transit_amount_dinar = self.transit_amount
+            else:
+                # If different currency, convert to Dinar using currency rate
+                rate = 1.0
+                if self.transit_currency_id:
+                    # Get the latest rate for the currency for the current company
+                    latest_rate = self.env['res.currency.rate'].search([
+                        ('currency_id', '=', self.transit_currency_id.id),
+                        ('company_id', '=', self.env.company.id)
+                    ], order='name desc', limit=1)
+
+                    if latest_rate:
+                        rate = latest_rate.rate
+                self.transit_amount_dinar = self.transit_amount * rate
 
 
     sum_quantity = fields.Float(
@@ -253,13 +317,12 @@ class CrmUpdatedWorkflow(models.Model):
             else:
                 record.transport_cost = 0
 
-    @api.depends('purchase_order_ids', 'purchase_order_ids.order_line', 'purchase_order_ids.order_line.product_qty')
+    @api.depends('order_line')
     def _compute_sum_quantity(self):
         for record in self:
             total_qty = 0.0
-            for order in record.purchase_order_ids:
-                for line in order.order_line:
-                    total_qty += line.product_qty
+            for line in record.order_line:
+                total_qty += line.product_qty
             record.sum_quantity = total_qty
 
     @api.depends('final_product_list_ids.prix_revient')
@@ -344,3 +407,18 @@ class CrmUpdatedWorkflow(models.Model):
                     'price_proposed': final_product.price_unit,
                 }))
             lead.estimation_line_ids = [(5, 0, 0)] + lines
+
+    @api.depends('purchase_rfq_ids.order_line')
+    def _compute_copy_to_cost_line(self):
+        print("Testing line hahahahah")
+        for lead in self:
+            lines = []
+            for rfq in lead.purchase_rfq_ids:
+                for line in rfq.order_line:
+                    print("Testing line for product:", line.product_id.name)
+                    lines.append((0, 0, {
+                        'product_id': line.product_id.id,
+                        'quantity': line.product_qty,
+                        'uom_id': line.product_uom.id
+                    }))
+            lead.cost_line_ids = [(5, 0, 0)] + lines

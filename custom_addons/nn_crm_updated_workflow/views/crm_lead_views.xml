@@ -50,6 +50,10 @@
 
                 </button>
             </xpath>
+            <xpath expr="//sheet/group/group[2]" position="inside">
+                <field name="currency_id" />
+
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="initial_product_list" string="Initial Product List"
                       invisible="final_product_list_generated">
@@ -81,9 +85,9 @@
                 </page>
 
 
-                <page string="Lignes de coût" invisible="not purchase_order_created">
+                <page string="Lignes de coût" invisible="not rfq_created">
                     <field name="cost_line_ids">
-                        <tree>
+                        <tree editable="bottom">
                             <field name="product_id"/>
                             <field name="barcode"/>
                             <field name="description"/>
@@ -211,7 +215,7 @@
 
 
                 </page>
-                <page string="Purchase Order Lines" name="purchase_rfq_lines">
+                <page string="Purchase Order Lines" name="purchase_rfq_lines" invisible="not order_line">
                     <field name="order_line" readonly="1">
                         <tree>
                             <field name="order_id"/>
