@@ -118,3 +118,28 @@ class PurchaseRFQUpdatedWorkflow(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
+
+    def action_view_crm(self):
+        self.ensure_one()
+        crm_lead = self.env['crm.lead'].search([('purchase_rfq_ids','=',self.id)],limit=1)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'CRM',
+            'res_model': 'crm.lead',
+            'res_id': crm_lead.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+
+    crm_lead_exist = fields.Boolean(
+        string='Crm Lead',
+        compute='_compute_crm_lead_exist'
+    )
+    def _compute_crm_lead_exist(self):
+        self.ensure_one()
+        purchase_order = self.env['crm.lead'].search([('purchase_rfq_ids','=',self.id)])
+        if purchase_order:
+            self.crm_lead_exist = True
+        else:
+            self.crm_lead_exist = False

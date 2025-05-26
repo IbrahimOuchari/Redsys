@@ -7,13 +7,27 @@
         <field name="arch" type="xml">
 
             <!-- Exemple : Ajouter un champ après le champ name -->
-            <xpath expr="//sheet" position="inside">
-                <field name="crm_lead_id" invisible="1"/>
+            <xpath expr="//field[@name='date_order']" position="after">
+<label for="crm_lead_id"/>
+                            <div name="crm_lead_id" >
+                                <field name="crm_lead_id" readonly="1"/>
 
+                            </div>
 
             </xpath>
 
+            <xpath expr="//sheet/div/button" position="after">
+                <field name="crm_lead_exist" invisible="1"/>
 
+                <button name="action_view_crm"
+                        type="object"
+                        string="CRM"
+                        class="oe_stat_button"
+                        icon="fa-file-text-o"
+                        invisible="not crm_lead_exist">
+
+                </button>
+            </xpath>
 <xpath expr="//field[@name='order_line']/tree//field[@name='date_planned']" position="after">
                 <field name="barcode" string="PN"/>
             </xpath>
