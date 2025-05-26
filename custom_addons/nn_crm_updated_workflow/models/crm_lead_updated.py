@@ -117,17 +117,22 @@ class CrmUpdatedWorkflow(models.Model):
         if not self.partner_id.email:
             raise UserError("Le client doit avoir au moins une adresse e-mail.")
 
+        # 🔍 Filtrer les lignes avec produits physiques uniquement
+        valid_lines = self.final_product_list_ids.filtered(
+            lambda line: line.product_id and line.product_id.detailed_type != 'service'
+        )
+
+        if not valid_lines:
+            raise UserError("Aucun produit physique à ajouter au RFQ (tous les produits sont de type 'service').")
+
+        # 🧾 Créer le RFQ
         purchase_rfq_vals = {
             'partner_id': self.partner_id.id,
             'crm_lead_id': self.id,
-            # Ajoute ici les autres champs requis de purchase.rfq
         }
-
         purchase_rfq = self.env['purchase.rfq'].sudo().create(purchase_rfq_vals)
 
-        for rfq_line in self.final_product_list_ids:
-            if not rfq_line.product_id:
-                raise UserError("Produit manquant dans une ligne.")
+        for rfq_line in valid_lines:
             self.env['purchase.rfq.line'].sudo().create({
                 'order_id': purchase_rfq.id,
                 'product_id': rfq_line.product_id.product_variant_id.id,
@@ -137,10 +142,6 @@ class CrmUpdatedWorkflow(models.Model):
                 'product_uom': rfq_line.uom_id.id,
                 'price_unit': rfq_line.price_unit or 0.0,
             })
-
-        # ➕ Si tu veux lier manuellement, assure-toi que c’est un Many2many
-        # Sinon ne fais rien ici, rely on the inverse field on purchase.rfq
-        # self.purchase_rfq_ids = [(4, purchase_rfq.id)]  # Supprimer ou corriger
 
         self.rfq_created = True
 
@@ -180,7 +181,9 @@ class CrmUpdatedWorkflow(models.Model):
     estimation_line_ids = fields.One2many(
         'crm.lead.estimation.line',
         'lead_id',
-        string="Estimations"
+        compute='_compute_copy_to_cost_estimation',
+        string="Estimations",
+        store= True,
     )
 
 
@@ -394,23 +397,24 @@ class CrmUpdatedWorkflow(models.Model):
                 }
             }
 
-    @api.onchange('final_product_list_ids')
-    def _onchange_copy_final_products_to_estimations(self):
+    @api.depends('purchase_rfq_ids.order_line')
+    def _compute_copy_to_cost_estimation(self):
+        print("Testing _compute_copy_to_cost_estimation ")
         for lead in self:
             lines = []
-            for final_product in lead.final_product_list_ids:
-                lines.append((0, 0, {
-                    'product_id': final_product.product_id.id,
-                    'barcode': final_product.barcode,
-                    'quantity': final_product.quantity,
-                    'uom_id': final_product.uom_id.id,
-                    'price_proposed': final_product.price_unit,
-                }))
+            for rfq in lead.purchase_rfq_ids:
+                for line in rfq.order_line:
+                    lines.append((0, 0, {
+                        'product_id': line.product_id.product_tmpl_id.id,
+                        'quantity': line.product_qty,
+                        'uom_id': line.product_uom.id,
+                        'price_proposed':line.price_unit,
+                    }))
             lead.estimation_line_ids = [(5, 0, 0)] + lines
 
     @api.depends('purchase_rfq_ids.order_line')
     def _compute_copy_to_cost_line(self):
-        print("Testing line hahahahah")
+        print("Testing line ")
         for lead in self:
             lines = []
             for rfq in lead.purchase_rfq_ids:

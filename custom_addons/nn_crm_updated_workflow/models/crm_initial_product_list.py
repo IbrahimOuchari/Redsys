@@ -6,6 +6,7 @@ class InitialProductList(models.Model):
     _description = 'Initial Product List'
 
     description = fields.Char(string="Description")
+    product_id = fields.Many2one('product.template', string="Product")
     barcode = fields.Char(string="Part Number")
     name = fields.Char(string="Name")
     quantity = fields.Float(string="Quantity", default=1.0)
@@ -23,7 +24,7 @@ class InitialProductList(models.Model):
         ('consu', 'Consumable'),
         ('service', 'Service'),
         ('product', 'Storable Product')
-    ], string='Product Type', default='consu', required=True,
+    ], string='Product Type', default='product', required=True,
         help='A storable product is a product for which you manage stock. The Inventory app has to be installed.\n'
              'A consumable product is a product for which stock is not managed.\n'
              'A service is a non-material product you provide.')

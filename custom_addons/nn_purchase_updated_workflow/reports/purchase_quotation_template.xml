@@ -273,14 +273,18 @@
     </template>
 
     <!-- Add this to register the report action -->
-    <record id="action_report_purchasequotation" model="ir.actions.report">
-        <field name="name">Request for Quotation</field>
-        <field name="model">purchase.rfq</field>
-        <field name="report_type">qweb-pdf</field>
-        <field name="report_name">nn_purchase_updated_workflow.report_purchasequotation</field>
-        <field name="report_file">nn_purchase_updated_workflow.report_purchasequotation</field>
-        <field name="paperformat_id" ref="paperformat_purchasequotation_portrait"/>
-        <field name="binding_model_id" ref="model_purchase_rfq"/>
-        <field name="binding_type">report</field>
-    </record>
+<record id="purchase.action_report_purchasequotation" model="ir.actions.report">
+    <field name="name">Request for Quotation</field>
+    <field name="model">purchase.rfq</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">nn_purchase_updated_workflow.report_purchasequotation</field>
+    <field name="report_file">nn_purchase_updated_workflow.report_purchasequotation</field>
+    <field name="paperformat_id" ref="paperformat_purchasequotation_portrait"/>
+    <field name="binding_model_id" ref="model_purchase_rfq"/>
+    <field name="binding_type">report</field>
+        <field name="print_report_name">(object.name or 'Draft') + ' - RFQ'</field>
+
+    <!-- 📝 Ceci permet d'utiliser le champ `name` comme nom de fichier -->
+</record>
+
 </odoo>

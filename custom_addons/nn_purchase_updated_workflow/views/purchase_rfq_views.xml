@@ -20,10 +20,8 @@
 
 
 <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
-                <field name="price_unit" string="Unit Price"/>
-
-
-            </xpath>
+    <field name="price_unit" string="Prix Unitaire" invisible="state in ('draft','sent')"/>
+</xpath>
 
 
         </field>

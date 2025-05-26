@@ -51,7 +51,7 @@
                 </button>
             </xpath>
             <xpath expr="//sheet/group/group[2]" position="inside">
-                <field name="currency_id" />
+                <field name="currency_id"/>
 
             </xpath>
             <xpath expr="//notebook" position="inside">
@@ -59,12 +59,13 @@
                       invisible="final_product_list_generated">
                     <field name="initial_product_list_ids">
                         <tree editable="bottom">
-                            <field name="name"/>
+                            <field name="name" invisible="detailed_type == 'service'"/>
+                            <field name="product_id" invisible="detailed_type != 'service'" domain="[('detailed_type','=','service')]"/>
                             <field name="detailed_type"/>
-                            <field name="barcode"/>
+                            <field name="barcode" readonly="detailed_type == 'service'"/>
                             <field name="description"/>
                             <field name="quantity"/>
-                            <field name="taux_tva" widget="many2many_tags"/>
+                            <field name="taux_tva" widget="many2many_tags"  readonly="detailed_type == 'service'"/>
                             <field name="unit_of_measure_id"/>
                         </tree>
                     </field>
