@@ -60,12 +60,13 @@
                     <field name="initial_product_list_ids">
                         <tree editable="bottom">
                             <field name="name" invisible="detailed_type == 'service'"/>
-                            <field name="product_id" invisible="detailed_type != 'service'" domain="[('detailed_type','=','service')]"/>
+                            <field name="product_id" invisible="detailed_type != 'service'"
+                                   domain="[('detailed_type','=','service')]"/>
                             <field name="detailed_type"/>
                             <field name="barcode" readonly="detailed_type == 'service'"/>
                             <field name="description"/>
                             <field name="quantity"/>
-                            <field name="taux_tva" widget="many2many_tags"  readonly="detailed_type == 'service'"/>
+                            <field name="taux_tva" widget="many2many_tags" />
                             <field name="unit_of_measure_id"/>
                         </tree>
                     </field>
@@ -99,19 +100,19 @@
                         </tree>
                     </field>
                 </page>
-                <page string="Estimation" invisible="not rfq_created">
-                    <field name="estimation_line_ids">
-                        <tree editable="bottom">
-                            <field name="barcode"/>
-                            <field name="product_id"/>
-                            <field name="description"/>
-                            <field name="quantity"/>
-                            <field name="uom_id"/>
-                            <field name="price_proposed"/>
-                            <field name="total" readonly="1"/>
-                            <field name="sum_of_total" readonly="1"/>
-                        </tree>
-                    </field>
+                <page string="Logistic Cost" invisible="not rfq_created">
+                    <!--                    <field name="estimation_line_ids">-->
+                    <!--                        <tree editable="bottom">-->
+                    <!--                            <field name="barcode"/>-->
+                    <!--                            <field name="product_id"/>-->
+                    <!--                            <field name="description"/>-->
+                    <!--                            <field name="quantity"/>-->
+                    <!--                            <field name="uom_id"/>-->
+                    <!--                            <field name="price_proposed"/>-->
+                    <!--                            <field name="total" readonly="1"/>-->
+                    <!--                            <field name="sum_of_total" readonly="1"/>-->
+                    <!--                        </tree>-->
+                    <!--                    </field>-->
                     <group string="Financial Details">
 
 
@@ -186,10 +187,9 @@
                                     <thead>
                                         <tr>
                                             <th style="text-align: left; font-size: 1.2em; padding: 8px 12px;">
-                                                Cost by Product
                                             </th>
                                             <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
-                                                Total Amount (Dinar)
+                                                Logistic Cost (Dinar)
                                             </th>
                                             <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
                                                 Transport Cost (Dinar)
@@ -199,10 +199,9 @@
                                     <tbody>
                                         <tr>
                                             <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">
-                                                <field name="cost_by_product"/>
                                             </td>
                                             <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
-                                                <field name="total_amount_dinar"/>
+                                                <field name="logistic_cost"/>
                                             </td>
                                             <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
                                                 <field name="transport_cost"/>
@@ -214,6 +213,46 @@
                         </group>
                     </group>
 
+
+                </page>
+                <page string="DD">
+                    <field name="crm_lead_fee_dd_ids" readonly="0">
+                        <tree editable="bottom" edit="True">
+                            <field name="pn"/>
+                            <field name="product_id"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="prix_fournisseur"/>
+                            <field name="cout_transport_unitaire"/>
+                            <field name="cout_transport_total_unitaire"/>
+                            <field name="taux_dd_id"/>
+                            <field name="fee_dd"/>
+                            <field name="uom_id"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Cout de Revient">
+                    <field name="cout_revient_ids" readonly="0">
+                        <tree editable="bottom">
+                            <field name="pn" string="PN"/>
+                            <field name="product_id" string="Produit" required="1"/>
+                            <field name="description" string="Description"/>
+                            <field name="quantity" string="Quantité" sum="Total Quantité"/>
+                            <field name="uom_id" string="UdM"/>
+                            <field name="prix_dachat_unitaire" string="Prix d'achat unitaire" sum="Total Prix d'achat"/>
+                            <field name="fee_dd" string="Frais de douane" sum="Total Frais douane"/>
+                            <field name="cout_logstic_unitaire" string="Cout Logistique" sum="Total Cout Logistique"/>
+                            <field name="cout_certification_uniatire" string="Cout Certification"
+                                   sum="Total Certification"/>
+                            <field name="cout_revient_unitaire" string="Cout Revient Unitaire"
+                                   sum="Total Cout Revient Unitaire"/>
+                            <field name="cout_revient_global" string="Cout Revient Global"
+                                   sum="Total Cout Revient Global"/>
+                            <field name="taux_marge" string="Taux Marge (%)"/>
+                            <field name="prix_vente_conseille" string="Prix Vente Conseillé" sum="Total Prix Vente"/>
+                        </tree>
+
+                    </field>
 
                 </page>
                 <page string="Purchase Order Lines" name="purchase_rfq_lines" invisible="not order_line">

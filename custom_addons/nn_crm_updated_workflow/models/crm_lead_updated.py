@@ -1,5 +1,6 @@
 from odoo import fields,api , models
 from odoo.exceptions import UserError, ValidationError
+from wheel.macosx_libfile import FAT_MAGIC
 
 
 class CrmUpdatedWorkflow(models.Model):
@@ -178,12 +179,24 @@ class CrmUpdatedWorkflow(models.Model):
 
 
 
-    estimation_line_ids = fields.One2many(
-        'crm.lead.estimation.line',
+    crm_lead_fee_dd_ids = fields.One2many(
+        'crm.lead.fee.dd',
         'lead_id',
-        compute='_compute_copy_to_cost_estimation',
-        string="Estimations",
+        compute='_compute_copy_to_fee_dd',
+        string="Fee DD",
         store= True,
+        readony=False,
+    )
+
+
+    cout_revient_ids = fields.One2many(
+        'crm.lead.cout.revient',
+        'lead_id',
+        compute='_compute_copy_to_cost_line',
+
+        string="Cout de revient",
+        store= True,
+        readonly=False,
     )
 
 
@@ -223,9 +236,30 @@ class CrmUpdatedWorkflow(models.Model):
                                      store=True)
 
     total_amount_dinar = fields.Float( string="Total Amount in Dinar",
-                                      store=True)
+                                      store=True, compute='_compute_total_amount_dinar')
+
+    @api.onchange('transit_amount_dinar','transport_amount_dinar')
+    def _compute_total_amount_dinar(self):
+        for record in self:
+            if record.transit_amount_dinar and record.transport_amount_dinar:
+                record.total_amount_dinar = record.transport_amount_dinar + record.transit_amount_dinar
+            else:
+                record.total_amount_dinar = 0.0
+
+
     cost_by_product = fields.Float( string="Cost by product", store=True)
     logistic_cost  = fields.Float(string='Logistic Cost',compute='_compute_logistic_cost')
+    transport_cost  = fields.Float(string='Transport Cost',compute='_compute_transport_cost')
+
+    @api.onchange('total_amount_dinar','sum_quantity')
+    def _compute_transport_cost(self):
+        print("TEst")
+        for record in self:
+            if record.sum_quantity >0:
+               record.transport_cost = record.total_amount_dinar/ record.sum_quantity or 0.0
+            else:
+                record.transport_cost = 0
+
     @api.onchange('transport_amount_dinar','transit_amount_dinar')
     def _compute_logistic_cost(self):
         for record in self:
@@ -310,15 +344,8 @@ class CrmUpdatedWorkflow(models.Model):
         store=True,
     )
 
-    transport_cost = fields.Float(string='Transport Cost', compute='_compute_transport_cost')
 
-    @api.onchange('total_amount_dinar','sum_quantity')
-    def _compute_transport_cost(self):
-        for record in self:
-            if record.sum_quantity >0:
-               record.transport_cost = record.total_amount_dinar/ record.sum_quantity or 0.0
-            else:
-                record.transport_cost = 0
+
 
     @api.depends('order_line')
     def _compute_sum_quantity(self):
@@ -398,7 +425,7 @@ class CrmUpdatedWorkflow(models.Model):
             }
 
     @api.depends('purchase_rfq_ids.order_line')
-    def _compute_copy_to_cost_estimation(self):
+    def _compute_copy_to_fee_dd(self):
         print("Testing _compute_copy_to_cost_estimation ")
         for lead in self:
             lines = []
@@ -408,9 +435,9 @@ class CrmUpdatedWorkflow(models.Model):
                         'product_id': line.product_id.product_tmpl_id.id,
                         'quantity': line.product_qty,
                         'uom_id': line.product_uom.id,
-                        'price_proposed':line.price_unit,
+                        'prix_fournisseur':line.price_unit,
                     }))
-            lead.estimation_line_ids = [(5, 0, 0)] + lines
+            lead.crm_lead_fee_dd_ids = [(5, 0, 0)] + lines
 
     @api.depends('purchase_rfq_ids.order_line')
     def _compute_copy_to_cost_line(self):
@@ -426,3 +453,24 @@ class CrmUpdatedWorkflow(models.Model):
                         'uom_id': line.product_uom.id
                     }))
             lead.cost_line_ids = [(5, 0, 0)] + lines
+
+
+    @api.depends('crm_lead_fee_dd_ids', 'crm_lead_fee_dd_ids.product_id', 'crm_lead_fee_dd_ids.pn', 'crm_lead_fee_dd_ids.quantity', 'crm_lead_fee_dd_ids.fee_dd')
+    def _compute_copy_to_cost_line(self):
+        """
+        Copy lines from crm_lead_fee_dd_ids to cout_revient_ids when fee_dd lines change
+        """
+        print("Testing copy to cost line")
+        for lead in self:
+            lines = []
+            for fee_line in lead.crm_lead_fee_dd_ids:
+                if fee_line.product_id:
+                    lines.append((0, 0, {
+                        'pn': fee_line.pn,
+                        'product_id': fee_line.product_id.id,
+                        'quantity': fee_line.quantity,
+                        'uom_id': fee_line.uom_id.id if fee_line.uom_id else False,
+                        'fee_dd': fee_line.fee_dd,  # Copy supplier price as purchase price
+                    }))
+            # Clear existing lines and add new ones
+            lead.cout_revient_ids = [(5, 0, 0)] + lines

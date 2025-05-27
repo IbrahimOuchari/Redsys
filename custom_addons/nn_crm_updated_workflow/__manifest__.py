@@ -12,6 +12,7 @@ Ce module met à jour les vues personnalisées et le workflow du module CRM.
     'data': [
         'security/ir.model.access.csv',
         'views/crm_lead_views.xml',
+        'views/taux_dd_menu.xml',
     ],
     'assets': {},
     'installable': True,

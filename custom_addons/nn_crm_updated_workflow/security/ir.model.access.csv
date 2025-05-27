@@ -4,6 +4,9 @@ access_crm_initial_product_list_user,access.crm.initial.product.list.user,model_
 access_crm_final_product_list_user,access.crm.final.product.list.user,model_crm_final_product_list,base.group_user,1,1,1,1
 
 
-access_crm_lead_estimation_line,access.crm.lead.estimation.line,model_crm_lead_estimation_line,,1,1,1,1
+access_crm_lead_fee_dd,access.crm.lead.fee.dd,model_crm_lead_fee_dd,,1,1,1,1
 access_crm_lead_cost_line,crm.lead.cost.line,model_crm_lead_cost_line,base.group_user,1,1,1,1
+access_taux_dd,taux.dd,model_taux_dd,base.group_user,1,1,1,1
+
+access_crm_lead_cout_revient,crm.lead.cout.revient,model_crm_lead_cout_revient,base.group_user,1,1,1,1
 
