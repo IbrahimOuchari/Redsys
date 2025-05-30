@@ -6,8 +6,18 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
 
+    <xpath expr="//header/button[1]" position="attributes">
+    <attribute name="invisible">True</attribute>
+</xpath>
+
+
             <!-- Exemple : Ajouter un champ après le champ name -->
             <xpath expr="//header" position="inside">
+                <field name="sale_quotation_created" invisible="1"/>
+                <button name="action_create_quotation"
+                        type="object"
+                        string="Créer un Devis"
+                        class="btn-primary" invisible="sale_quotation_created"/>
                 <button name="action_create_rfq"
                         type="object"
                         string="Create RFQ"
@@ -59,14 +69,15 @@
                       invisible="final_product_list_generated">
                     <field name="initial_product_list_ids">
                         <tree editable="bottom">
+                            <field name="detailed_type"/>
+
                             <field name="name" invisible="detailed_type == 'service'"/>
                             <field name="product_id" invisible="detailed_type != 'service'"
                                    domain="[('detailed_type','=','service')]"/>
-                            <field name="detailed_type"/>
                             <field name="barcode" readonly="detailed_type == 'service'"/>
                             <field name="description"/>
                             <field name="quantity"/>
-                            <field name="taux_tva" widget="many2many_tags" />
+                            <field name="taux_tva" widget="many2many_tags"/>
                             <field name="unit_of_measure_id"/>
                         </tree>
                     </field>
@@ -75,9 +86,10 @@
                       invisible="not final_product_list_generated">
                     <field name="final_product_list_ids">
                         <tree editable="bottom">
+                            <field name="detailed_type" column_invisible="1"/>
+
                             <field name="barcode" string="PN"/>
                             <field name="product_id"/>
-                            <field name="detailed_type"/>
                             <field name="description"/>
                             <field name="quantity"/>
                             <field name="uom_id"/>
@@ -86,175 +98,223 @@
                     </field>
                 </page>
 
-
-                <page string="Lignes de coût" invisible="not rfq_created">
-                    <field name="cost_line_ids">
+                <page string="Estimations Produits" invisible="not order_line">
+                    <field name="estimation_product_ids">
                         <tree editable="bottom">
-                            <field name="product_id"/>
-                            <field name="barcode"/>
-                            <field name="description"/>
-                            <field name="quantity"/>
-                            <field name="uom_id"/>
-                            <field name="purchase_price"/>
-                            <field name="prix_de_revient"/>
+                            <field name="pn" width="100px"/>
+                            <field name="product_id" width="100px"/>
+                            <field name="quantity" width="100px"/>
+                            <field name="prix_unitaire" width="100px"/>
+                            <field name="estimation_transport_devis" width="100px"/>
+                            <field name="total_devis" width="100px"/>
+                            <field name="taux_change" width="100px" optional="hide"/>
+                            <field name="total_dinar" width="100px"/>
+                            <field name="estimation_transport_dinar" width="100px"/>
+                            <field name="taux_dd_id" width="100px"/>
+                            <field name="fee_dd" width="100px"/>
+                            <field name="taux_change" width="100px"/>
+                            <field name="transit" width="100px"/>
+                            <field name="cert" width="100px"/>
+                            <field name="prix_revient" width="100px"/>
+                            <field name="margin_percentage" width="100px"/>
+                            <field name="margin" width="100px"/>
+                            <field name="prix_final" width="100px"/>
+                            <field name="price_unit" width="100px"/>
                         </tree>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <field name="pn"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity" width=""/>
+                                    <field name="prix_unitaire"/>
+                                    <field name="estimation_transport_devis"/>
+                                    <field name="total_devis"/>
+                                    <field name="total_dinar"/>
+                                    <field name="estimation_transport_dinar"/>
+                                    <field name="taux_dd_id"/>
+                                    <field name="fee_dd"/>
+                                    <field name="taux_change"/>
+                                    <field name="transit"/>
+                                    <field name="cert"/>
+                                    <field name="prix_revient"/>
+                                    <field name="margin_percentage" widget="percentage"/>
+                                    <field name="margin"/>
+                                    <field name="prix_final"/>
+                                    <field name="price_unit"/>
+                                </group>
+                            </sheet>
+                        </form>
                     </field>
                 </page>
-                <page string="Logistic Cost" invisible="not rfq_created">
-                    <!--                    <field name="estimation_line_ids">-->
-                    <!--                        <tree editable="bottom">-->
-                    <!--                            <field name="barcode"/>-->
-                    <!--                            <field name="product_id"/>-->
-                    <!--                            <field name="description"/>-->
-                    <!--                            <field name="quantity"/>-->
-                    <!--                            <field name="uom_id"/>-->
-                    <!--                            <field name="price_proposed"/>-->
-                    <!--                            <field name="total" readonly="1"/>-->
-                    <!--                            <field name="sum_of_total" readonly="1"/>-->
-                    <!--                        </tree>-->
-                    <!--                    </field>-->
-                    <group string="Financial Details">
+                <!--                <page string="Lignes de coût" invisible="not rfq_created">-->
+                <!--                    <field name="cost_line_ids">-->
+                <!--                        <tree editable="bottom">-->
+                <!--                            <field name="product_id"/>-->
+                <!--                            <field name="barcode"/>-->
+                <!--                            <field name="description"/>-->
+                <!--                            <field name="quantity"/>-->
+                <!--                            <field name="uom_id"/>-->
+                <!--                            <field name="purchase_price"/>-->
+                <!--                            <field name="prix_de_revient"/>-->
+                <!--                        </tree>-->
+                <!--                    </field>-->
+                <!--                </page>-->
+                <!--                <page string="Logistic Cost" invisible="not rfq_created">-->
+                <!--                    &lt;!&ndash;                    <field name="estimation_line_ids">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                        <tree editable="bottom">&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="barcode"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="product_id"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="description"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="quantity"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="uom_id"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="price_proposed"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="total" readonly="1"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                            <field name="sum_of_total" readonly="1"/>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                        </tree>&ndash;&gt;-->
+                <!--                    &lt;!&ndash;                    </field>&ndash;&gt;-->
+                <!--                    <group string="Financial Details">-->
 
 
-                        <group colspan="2">
-                            <div class="mb-3">
-                                <strong>Transport</strong>
-                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
-                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
-                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="text-align: left; padding: 8px 12px;">
-                                                <field name="transport_amount"/>
-                                            </td>
-                                            <td style="text-align: center; padding: 8px 12px;">
-                                                <field name="transport_currency_id"
-                                                       style="min-width: 120px; width: 100%;"
-                                                       options="{'no_create': True}"/>
-                                            </td>
-                                            <td style="text-align: right; padding: 8px 12px;">
-                                                <field name="transport_amount_dinar"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
+                <!--                        <group colspan="2">-->
+                <!--                            <div class="mb-3">-->
+                <!--                                <strong>Transport</strong>-->
+                <!--                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">-->
+                <!--                                    <thead>-->
+                <!--                                        <tr>-->
+                <!--                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>-->
+                <!--                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>-->
+                <!--                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar-->
+                <!--                                            </th>-->
+                <!--                                        </tr>-->
+                <!--                                    </thead>-->
+                <!--                                    <tbody>-->
+                <!--                                        <tr>-->
+                <!--                                            <td style="text-align: left; padding: 8px 12px;">-->
+                <!--                                                <field name="transport_amount"/>-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: center; padding: 8px 12px;">-->
+                <!--                                                <field name="transport_currency_id"-->
+                <!--                                                       style="min-width: 120px; width: 100%;"-->
+                <!--                                                       options="{'no_create': True}"/>-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: right; padding: 8px 12px;">-->
+                <!--                                                <field name="transport_amount_dinar"/>-->
+                <!--                                            </td>-->
+                <!--                                        </tr>-->
+                <!--                                    </tbody>-->
+                <!--                                </table>-->
+                <!--                            </div>-->
+                <!--                        </group>-->
 
-                        <group colspan="2">
-                            <div class="mb-3">
-                                <strong>Transit</strong>
-                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>
-                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>
-                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="text-align: left; padding: 8px 12px;">
-                                                <field name="transit_amount"/>
-                                            </td>
-                                            <td style="text-align: center; padding: 8px 12px;">
-                                                <field name="transit_currency_id"
-                                                       style="min-width: 120px; width: 100%;"
-                                                       options="{'no_create': True}"/>
-                                            </td>
-                                            <td style="text-align: right; padding: 8px 12px;">
-                                                <field name="transit_amount_dinar"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
-
-
-                        <group>
-                            <field name="sum_quantity" invisible="1"/>
-                            <div class="mb-3">
-                                <strong>Additional Cost Allocation</strong>
-                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; font-size: 1.2em; padding: 8px 12px;">
-                                            </th>
-                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
-                                                Logistic Cost (Dinar)
-                                            </th>
-                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">
-                                                Transport Cost (Dinar)
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">
-                                            </td>
-                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
-                                                <field name="logistic_cost"/>
-                                            </td>
-                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">
-                                                <field name="transport_cost"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </group>
-                    </group>
+                <!--                        <group colspan="2">-->
+                <!--                            <div class="mb-3">-->
+                <!--                                <strong>Transit</strong>-->
+                <!--                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">-->
+                <!--                                    <thead>-->
+                <!--                                        <tr>-->
+                <!--                                            <th style="text-align: left; padding: 8px 12px;">Amount</th>-->
+                <!--                                            <th style="text-align: center; padding: 8px 12px;">Currency</th>-->
+                <!--                                            <th style="text-align: right; padding: 8px 12px;">Amount in Dinar-->
+                <!--                                            </th>-->
+                <!--                                        </tr>-->
+                <!--                                    </thead>-->
+                <!--                                    <tbody>-->
+                <!--                                        <tr>-->
+                <!--                                            <td style="text-align: left; padding: 8px 12px;">-->
+                <!--                                                <field name="transit_amount"/>-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: center; padding: 8px 12px;">-->
+                <!--                                                <field name="transit_currency_id"-->
+                <!--                                                       style="min-width: 120px; width: 100%;"-->
+                <!--                                                       options="{'no_create': True}"/>-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: right; padding: 8px 12px;">-->
+                <!--                                                <field name="transit_amount_dinar"/>-->
+                <!--                                            </td>-->
+                <!--                                        </tr>-->
+                <!--                                    </tbody>-->
+                <!--                                </table>-->
+                <!--                            </div>-->
+                <!--                        </group>-->
 
 
-                </page>
-                <page string="DD">
-                    <field name="crm_lead_fee_dd_ids" readonly="0">
-                        <tree editable="bottom" edit="True">
-                            <field name="pn"/>
-                            <field name="product_id"/>
-                            <field name="description"/>
-                            <field name="quantity"/>
-                            <field name="prix_fournisseur"/>
-                            <field name="cout_transport_unitaire"/>
-                            <field name="cout_transport_total_unitaire"/>
-                            <field name="taux_dd_id"/>
-                            <field name="fee_dd"/>
-                            <field name="uom_id"/>
-                        </tree>
-                    </field>
-                </page>
-                <page string="Cout de Revient">
-                    <field name="cout_revient_ids" readonly="0">
-                        <tree editable="bottom">
-                            <field name="pn" string="PN"/>
-                            <field name="product_id" string="Produit" required="1"/>
-                            <field name="description" string="Description"/>
-                            <field name="quantity" string="Quantité" sum="Total Quantité"/>
-                            <field name="uom_id" string="UdM"/>
-                            <field name="prix_dachat_unitaire" string="Prix d'achat unitaire" sum="Total Prix d'achat"/>
-                            <field name="fee_dd" string="Frais de douane" sum="Total Frais douane"/>
-                            <field name="cout_logstic_unitaire" string="Cout Logistique" sum="Total Cout Logistique"/>
-                            <field name="cout_certification_uniatire" string="Cout Certification"
-                                   sum="Total Certification"/>
-                            <field name="cout_revient_unitaire" string="Cout Revient Unitaire"
-                                   sum="Total Cout Revient Unitaire"/>
-                            <field name="cout_revient_global" string="Cout Revient Global"
-                                   sum="Total Cout Revient Global"/>
-                            <field name="taux_marge" string="Taux Marge (%)"/>
-                            <field name="prix_vente_conseille" string="Prix Vente Conseillé" sum="Total Prix Vente"/>
-                        </tree>
+                <!--                        <group>-->
+                <!--                            <field name="sum_quantity" invisible="1"/>-->
+                <!--                            <div class="mb-3">-->
+                <!--                                <strong>Additional Cost Allocation</strong>-->
+                <!--                                <table style="width: 100%; border-collapse: separate; border-spacing: 35px 15px;">-->
+                <!--                                    <thead>-->
+                <!--                                        <tr>-->
+                <!--                                            <th style="text-align: left; font-size: 1.2em; padding: 8px 12px;">-->
+                <!--                                            </th>-->
+                <!--                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">-->
+                <!--                                                Logistic Cost (Dinar)-->
+                <!--                                            </th>-->
+                <!--                                            <th style="text-align: right; font-size: 1.2em; padding: 8px 12px;">-->
+                <!--                                                Transport Cost (Dinar)-->
+                <!--                                            </th>-->
+                <!--                                        </tr>-->
+                <!--                                    </thead>-->
+                <!--                                    <tbody>-->
+                <!--                                        <tr>-->
+                <!--                                            <td style="text-align: left; font-size: 1.1em; padding: 8px 12px;">-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">-->
+                <!--                                                <field name="logistic_cost"/>-->
+                <!--                                            </td>-->
+                <!--                                            <td style="text-align: right; font-size: 1.1em; padding: 8px 12px;">-->
+                <!--                                                <field name="transport_cost"/>-->
+                <!--                                            </td>-->
+                <!--                                        </tr>-->
+                <!--                                    </tbody>-->
+                <!--                                </table>-->
+                <!--                            </div>-->
+                <!--                        </group>-->
+                <!--                    </group>-->
 
-                    </field>
 
-                </page>
+                <!--                </page>-->
+                <!--                <page string="DD">-->
+                <!--                    <field name="crm_lead_fee_dd_ids" readonly="0">-->
+                <!--                        <tree editable="bottom" edit="True">-->
+                <!--                            <field name="pn"/>-->
+                <!--                            <field name="product_id"/>-->
+                <!--                            <field name="description"/>-->
+                <!--                            <field name="quantity"/>-->
+                <!--                            <field name="prix_fournisseur"/>-->
+                <!--                            <field name="cout_transport_unitaire"/>-->
+                <!--                            <field name="cout_transport_total_unitaire"/>-->
+                <!--                            <field name="taux_dd_id"/>-->
+                <!--                            <field name="fee_dd"/>-->
+                <!--                            <field name="uom_id"/>-->
+                <!--                        </tree>-->
+                <!--                    </field>-->
+                <!--                </page>-->
+                <!--                <page string="Cout de Revient">-->
+                <!--                    <field name="cout_revient_ids" readonly="0">-->
+                <!--                        <tree editable="bottom">-->
+                <!--                            <field name="pn" string="PN"/>-->
+                <!--                            <field name="product_id" string="Produit" required="1"/>-->
+                <!--                            <field name="description" string="Description"/>-->
+                <!--                            <field name="quantity" string="Quantité" sum="Total Quantité"/>-->
+                <!--                            <field name="uom_id" string="UdM"/>-->
+                <!--                            <field name="prix_dachat_unitaire" string="Prix d'achat unitaire" sum="Total Prix d'achat"/>-->
+                <!--                            <field name="fee_dd" string="Frais de douane" sum="Total Frais douane"/>-->
+                <!--                            <field name="cout_logstic_unitaire" string="Cout Logistique" sum="Total Cout Logistique"/>-->
+                <!--                            <field name="cout_certification_uniatire" string="Cout Certification"-->
+                <!--                                   sum="Total Certification"/>-->
+                <!--                            <field name="cout_revient_unitaire" string="Cout Revient Unitaire"-->
+                <!--                                   sum="Total Cout Revient Unitaire"/>-->
+                <!--                            <field name="cout_revient_global" string="Cout Revient Global"-->
+                <!--                                   sum="Total Cout Revient Global"/>-->
+                <!--                            <field name="taux_marge" string="Taux Marge (%)"/>-->
+                <!--                            <field name="prix_vente_conseille" string="Prix Vente Conseillé" sum="Total Prix Vente"/>-->
+                <!--                        </tree>-->
+
+                <!--                    </field>-->
+
+                <!--                </page>-->
                 <page string="Purchase Order Lines" name="purchase_rfq_lines" invisible="not order_line">
                     <field name="order_line" readonly="1">
                         <tree>

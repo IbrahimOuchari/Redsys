@@ -4,15 +4,15 @@ class FinalProductList(models.Model):
     _name = 'crm.final.product.list'
     _description = 'Final Product List'
 
-    barcode = fields.Char(string="PN", help="Part Number")
+    barcode = fields.Char(string="PN", related='product_id.barcode',help="Part Number" ,readonly=False)
     product_id = fields.Many2one(
         comodel_name='product.template',
         string="Product"
     )
-    description = fields.Text(related='product_id.description_purchase',string="Description")
+    description = fields.Text(related='product_id.description_purchase',string="Description",readonly=False)
     quantity = fields.Float(string="Quantity", default=1.0)
-    uom_id = fields.Many2one(
-        comodel_name='uom.uom',
+    uom_id = fields.Many2many(
+        related='product_id.taxes_id',
         string="Unit of Measure",
         ondelete='restrict'
     )

@@ -6,18 +6,26 @@
         <field name="inherit_id" ref="purchase.purchase_rfq_form"/>
         <field name="arch" type="xml">
 
+            <xpath expr="//button[@name='button_creat_po']" position="replace">
+                <button name="button_creat_po" type="object" string="Create PO"
+                        invisible="state != 'rfq' or not sale_quotation_confirmed"
+                        groups="purchase.group_purchase_manager" class="btn-primary" data-hotkey="l"/>
+            </xpath>
+
             <!-- Exemple : Ajouter un champ après le champ name -->
             <xpath expr="//field[@name='date_order']" position="after">
-<label for="crm_lead_id"/>
-                            <div name="crm_lead_id" >
-                                <field name="crm_lead_id" readonly="1"/>
+                <label for="crm_lead_id"/>
+                <div name="crm_lead_id">
+                    <field name="crm_lead_id" readonly="1"/>
 
-                            </div>
+                </div>
 
             </xpath>
 
             <xpath expr="//sheet/div/button" position="after">
                 <field name="crm_lead_exist" invisible="1"/>
+                <field name="sale_quotation_confirmed" invisible="1"/>
+
 
                 <button name="action_view_crm"
                         type="object"
@@ -28,14 +36,14 @@
 
                 </button>
             </xpath>
-<xpath expr="//field[@name='order_line']/tree//field[@name='date_planned']" position="after">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='date_planned']" position="after">
                 <field name="barcode" string="PN"/>
             </xpath>
 
 
-<xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
-    <field name="price_unit" string="Prix Unitaire" invisible="state in ('draft','sent')"/>
-</xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
+                <field name="price_unit" string="Prix Unitaire" invisible="state in ('draft','sent')"/>
+            </xpath>
 
 
         </field>

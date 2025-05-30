@@ -54,37 +54,64 @@ class CrmUpdatedWorkflow(models.Model):
 
             for line in lead.initial_product_list_ids:
                 barcode = line.barcode
-                product = self.env['product.template'].search([('barcode', '=', barcode)], limit=1)
-
+                product = None
                 line_product_found = False  # Track if this specific line's product exists
-                if product:
-                    # Existing product - fill with info from product.template
-                    final_lines.append((0, 0, {
-                        'barcode': barcode,
-                        'product_id': product.id,
-                        'description': line.description,
-                        'quantity': line.quantity,
-                        'uom_id': product.uom_id.id,
-                        'price_unit': product.list_price,
-                    }))
-                    line_product_found = True
+
+                # Scenario 1: Line has barcode - search for existing product
+                if barcode:
+                    product = self.env['product.template'].search([('barcode', '=', barcode)], limit=1)
+
+                    if product:
+                        # Existing product found - use it
+                        final_lines.append((0, 0, {
+                            'barcode': barcode,
+                            'product_id': product.id,
+                            'description': line.description,
+                            'quantity': line.quantity,
+                            'uom_id': product.uom_id.id,
+                            'price_unit': product.list_price,
+                        }))
+                        line_product_found = True
+                    else:
+                        # No existing product with this barcode - create new one
+                        new_product = self.env['product.template'].create({
+                            'name': line.name or f'New Product {barcode}',
+                            'barcode': barcode,
+                            'uom_id': line.unit_of_measure_id.id,
+                            'taxes_id': [(6, 0, line.taux_tva.ids)] if line.taux_tva else False,
+                            'uom_po_id': line.unit_of_measure_id.id,
+                            'type': line.detailed_type,
+                            'detailed_type': line.detailed_type,
+                            'list_price': 0.0,
+                            'description_purchase': line.description,
+                        })
+
+                        final_lines.append((0, 0, {
+                            'barcode': barcode,
+                            'product_id': new_product.id,
+                            'description': line.description,
+                            'quantity': line.quantity,
+                            'uom_id': new_product.uom_id.id,
+                            'price_unit': new_product.list_price,
+                        }))
+
+                # Scenario 2: Line has no barcode - always create new product
                 else:
-                    # Create new product in product.template
+                    # Create new product without barcode
                     new_product = self.env['product.template'].create({
-                        'name': line.name or f'New Product {barcode}',
-                        'barcode': barcode,
+                        'name': line.name or f'New Product - {line.description or "Unnamed"}',
+                        # No barcode field since it's empty
                         'uom_id': line.unit_of_measure_id.id,
-                        'taxes_id': [(6,0,line.taux_tva.ids)],
-                        'uom_po_id': line.unit_of_measure_id.id,  # Using the same UOM for purchase
-                        'type': line.detailed_type,  # Set default type, adjust if needed
-                        'detailed_type': line.detailed_type,  # Ensure it is a storable product
-                        'list_price': 0.0,  # Default price
+                        'taxes_id': [(6, 0, line.taux_tva.ids)] if line.taux_tva else False,
+                        'uom_po_id': line.unit_of_measure_id.id,
+                        'type': line.detailed_type,
+                        'detailed_type': line.detailed_type,
+                        'list_price': 0.0,
                         'description_purchase': line.description,
                     })
 
-                    # Use the newly created product
                     final_lines.append((0, 0, {
-                        'barcode': barcode,
+                        'barcode': '',  # Empty barcode
                         'product_id': new_product.id,
                         'description': line.description,
                         'quantity': line.quantity,
@@ -92,19 +119,18 @@ class CrmUpdatedWorkflow(models.Model):
                         'price_unit': new_product.list_price,
                     }))
 
-                # Update the overall product_found flag if any product was found
+                # Update the overall product_found flag
                 if line_product_found:
                     product_found = True
 
             # Update the final product list
             lead.final_product_list_ids = [(5, 0, 0)] + final_lines
-            lead.final_product_list_generated = True  # Set this flag regardless
+            lead.final_product_list_generated = True
 
             # Call the notification function with appropriate message
             return self.notify_product_status(product_found)
 
         return None
-
     def action_create_rfq(self):
         self.ensure_one()
 
@@ -474,3 +500,79 @@ class CrmUpdatedWorkflow(models.Model):
                     }))
             # Clear existing lines and add new ones
             lead.cout_revient_ids = [(5, 0, 0)] + lines
+
+    estimation_product_ids = fields.One2many('crm.lead.estimation.product', 'lead_id',
+                                             string="Liste des Estimations Produits",
+                                             compute='_compute_estimation_products',
+                                             readonly=False, store=True)
+    @api.depends('purchase_rfq_ids','purchase_rfq_ids.order_line')
+    def _compute_estimation_products(self):
+
+        for rec in self:
+            values = []
+            for line in rec.purchase_rfq_ids:
+                for order_line in line.order_line:
+                    values.append((0,0,{
+                        'product_id':order_line.product_id.product_tmpl_id.id,
+                        'prix_unitaire':order_line.price_unit,
+                        'quantity':order_line.product_qty,
+                    }))
+                rec.estimation_product_ids= [(5,0,0)] + values
+
+    @api.onchange('estimation_product_ids')
+    def _onchange_sync_prices(self):
+        print("🟡 estimation_product_ids changed, syncing prices...")
+
+        estimation_map = {
+            est.product_id.id: est.price_unit
+            for est in self.estimation_product_ids
+            if est.product_id and est.price_unit
+        }
+
+        print("🔄 Syncing prices from estimation to final product list...")
+
+        for final in self.final_product_list_ids:
+            if final.product_id and final.product_id.id in estimation_map:
+                print(
+                    f"➡ Updating {final.product_id.name}: {final.price_unit} -> {estimation_map[final.product_id.id]}"
+                )
+                final.price_unit = estimation_map[final.product_id.id]
+    sale_quotation_created= fields.Boolean(string="Sale quotations created" ,default=False)
+    def action_create_quotation(self):
+        print("Y")
+        self.ensure_one()
+
+        if not self.id:
+            raise UserError("Vous devez enregistrer l'enregistrement avant de créer le devis.")
+
+        if not self.final_product_list_ids or not self.final_product_list_generated:
+            raise UserError("Aucune liste de produits finaux n’a été générée.")
+        if not self.partner_id:
+            raise UserError("Veuillez sélectionner un client d'abord.")
+
+        # 🧾 Créer le devis
+        quotation_vals = {
+            'partner_id': self.partner_id.id,
+            'opportunity_id': self.id,
+            'company_id': self.company_id.id or self.env.company.id,
+            'crm_lead_id':self.id,
+        }
+        quotation = self.env['sale.quotation'].sudo().create(quotation_vals)
+
+        for line in self.final_product_list_ids:
+            self.env['sale.quotation.line'].sudo().create({
+                'order_id': quotation.id,
+                'product_id': line.product_id.product_variant_id.id,
+                'name': line.description or line.product_id.name,
+                'product_uom_qty': line.quantity,
+                'product_uom': line.product_id.uom_id.id if line.product_id.uom_id else False,
+                'price_unit': line.price_unit or 0.0,
+            })
+        self.sale_quotation_created = True
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.quotation',
+            'view_mode': 'form',
+            'res_id': quotation.id,
+            'target': 'current',
+        }

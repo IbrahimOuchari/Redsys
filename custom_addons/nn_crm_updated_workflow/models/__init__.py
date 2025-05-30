@@ -6,4 +6,6 @@ from . import purchase_rfq
 from . import crm_lead_cost_line
 from . import taux_dd
 from . import cout_revient
+from . import crm_lead_estimation_product
+from . import sale_quotation
 

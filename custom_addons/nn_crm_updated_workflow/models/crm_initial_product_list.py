@@ -5,9 +5,9 @@ class InitialProductList(models.Model):
     _name = 'crm.initial.product.list'
     _description = 'Initial Product List'
 
-    description = fields.Char(string="Description")
+    description = fields.Text(string="Description",related='product_id.description_sale', readonly=False)
     product_id = fields.Many2one('product.template', string="Product")
-    barcode = fields.Char(string="Part Number")
+    barcode = fields.Char(string="Part Number",related='product_id.barcode',readonly=False)
     name = fields.Char(string="Name")
     quantity = fields.Float(string="Quantity", default=1.0)
     unit_of_measure_id = fields.Many2one(
