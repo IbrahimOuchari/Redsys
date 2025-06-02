@@ -15,6 +15,7 @@ Ce module met à jour les vues personnalisées et le workflow du module d'Achat.
         # 'data/email_template_edi_purchase.xml',
         'views/purchase_order_views.xml',
         'views/purchase_rfq_views.xml',
+        'views/purchase_product_search.xml',
     ],
     'assets': {},
     'installable': True,
