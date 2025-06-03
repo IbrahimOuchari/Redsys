@@ -145,3 +145,8 @@ class PurchaseRFQUpdatedWorkflow(models.Model):
             self.crm_lead_exist = False
 
     sale_quotation_confirmed = fields.Boolean(string="Devis confirmé",default=False)
+
+    def action_confirm_sale(self):
+        for rec in self:
+            if not rec.sale_quotation_confirmed:
+                rec.sale_quotation_confirmed = True

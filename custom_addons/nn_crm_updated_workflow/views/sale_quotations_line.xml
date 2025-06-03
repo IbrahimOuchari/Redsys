@@ -12,7 +12,13 @@
     <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="after">
                 <field name="pn" string="PN"/>
             </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="pdf_logo" widget="boolean_toggle"/>
+
+    </xpath>
     </field>
+
 </record>
 
 

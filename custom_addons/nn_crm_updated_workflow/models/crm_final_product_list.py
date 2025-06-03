@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields,api
 
 class FinalProductList(models.Model):
     _name = 'crm.final.product.list'
@@ -30,3 +30,10 @@ class FinalProductList(models.Model):
         string="Product Type",
         store=True
     )
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        for rec in self:
+            if rec.detailed_type == 'service':
+                rec.price_unit = rec.product_id.standard_price
+

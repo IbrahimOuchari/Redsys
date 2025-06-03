@@ -10,6 +10,9 @@
                 <button name="button_creat_po" type="object" string="Create PO"
                         invisible="state != 'rfq' or not sale_quotation_confirmed"
                         groups="purchase.group_purchase_manager" class="btn-primary" data-hotkey="l"/>
+                <button name="action_confirm_sale" class="primary" type="object" string="Confirme Vente"
+                        invisible="state != 'rfq' or sale_quotation_confirmed"
+                        />
             </xpath>
 
             <!-- Exemple : Ajouter un champ après le champ name -->

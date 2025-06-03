@@ -8,4 +8,6 @@ from . import taux_dd
 from . import cout_revient
 from . import crm_lead_estimation_product
 from . import sale_quotation
+from . import sale_order
+
 

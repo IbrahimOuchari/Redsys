@@ -10,7 +10,7 @@ class SaleQuotation(models.Model):
         string="CRM Lead",
         ondelete='cascade'
     )
-
+    pdf_logo = fields.Boolean(string="PDF Logo", default=True)
 
 
     def action_confirm(self):
@@ -57,7 +57,20 @@ class SaleQuotation(models.Model):
             'target': 'current',
         }
 
+    def get_portal_last_transaction(self):
+        """Get the last transaction for this quotation"""
+        # This should return a transaction object or a dummy object with a 'state' attribute
+        # You'll need to implement this based on your business logic
 
+        # Example implementation (adjust based on your needs):
+        if hasattr(self, 'transaction_ids') and self.transaction_ids:
+            return self.transaction_ids.sorted('create_date', reverse=True)[0]
+
+        # Return a dummy object if no transactions exist
+        class DummyTransaction:
+            state = 'done'  # or whatever default state you want
+
+        return DummyTransaction()
 class SaleQuotationLine(models.Model):
     _inherit = 'sale.quotation.line'
 

@@ -17,11 +17,11 @@ class ProductTemplate(models.Model):
 
     purchase_rfq_id = fields.Many2one('purchase.order', string='Dernier RFQ', compute='_compute_purchase_rfq', store=True)
 
-    @api.model
-    def create(self,vals):
-        if not vals.get('creation_date'):
-            vals['creation_date'] = fields.date.context_today(self)
-        return super(ProductTemplate,self).creat(vals)
+    # @api.model
+    # def create(self,vals):
+    #     if not vals.get('creation_date'):
+    #         vals['creation_date'] = fields.date.context_today(self)
+    #     return super(ProductTemplate,self).creat(vals)
 
     @api.depends('qty_available')
     def _compute_last_movement_date(self):
