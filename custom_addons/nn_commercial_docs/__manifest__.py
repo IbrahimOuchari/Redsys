@@ -19,6 +19,7 @@ This module customizes the invoice reports in Odoo 17:
         'reports/account_invoice_report_templates.xml',
         'reports/sale_order_report.xml',
         'reports/custom_invoice_templates.xml',
+        'reports/sale_quotation_report.xml',
     ],
 
 
