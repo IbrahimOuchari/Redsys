@@ -1,74 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
- <template id="web.external_layout_standard">
-        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
-            <t t-if="o.pdf_logo">
-    <div class="row">
-        <div class="col-3 mb4">
-            <img t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+<template id="web.external_layout_standard">
+    <!-- HEADER: only logo top left -->
+    <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style" style="padding-bottom: 10px;">
+        <div class="row align-items-start">
+            <div class="col-2">
+                <t t-if="o.pdf_logo">
+                    <img t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+                </t>
+            </div>
         </div>
-        <div class="col-9 text-end" style="margin-top:22px;">
-            <span t-if="company.report_header" t-field="company.report_header" name="moto">Company tagline</span>
+
+        <!-- Horizontal line below the header -->
+<div t-if="company.logo or company.report_header or o.pdf_logo" class="row zero_min_height" style="margin-top: 8px;">
+    <div class="col-6"> <!-- half width column -->
+        <div style="border-bottom: 1px solid red; width: 100%;"></div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+        t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+        t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+
+        <t t-out="0"/>
+    </div>
+
+    <!-- FOOTER: three columns above the horizontal line -->
+    <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" style="padding-top: 10px;">
+        <div class="row" style="font-size: 0.8em; margin-bottom: 5px;">
+            <!-- Left: Company name -->
+            <div class="col-4" style="text-align: left;">
+                <span t-field="company.name"/>
+            </div>
+
+            <!-- Center: Address + phone and fax -->
+            <div class="col-4" style="text-align: center;">
+                <span t-field="company.street"/>, <span t-field="company.city"/> <span t-field="company.zip"/><br/>
+                <span><strong>Tél:</strong> <span t-field="company.phone"/></span> — <span><strong>Fax:</strong> <span t-field="company.fax"/></span>
+            </div>
+
+            <!-- Right: Email, website, RIB, IBAN -->
+            <div class="col-4" style="text-align: right;">
+                <span><strong>Email:</strong> <span t-field="company.email"/></span><br/>
+                <span><strong>Site web:</strong> <span t-field="company.website"/></span><br/>
+<!--                <span><strong>RIB:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].acc_number or ''"/></span><br/>-->
+<!--                <span><strong>IBAN:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].iban or ''"/></span>-->
+            </div>
+        </div>
+
+        <!-- Horizontal line below the info -->
+<div style="border-top: 40px solid red;"></div>
+
+        <!-- Page number and document name -->
+        <div t-if="report_type == 'pdf'" class="text-center text-muted" style="margin-top: 5px;">
+            Page: <span class="page"/> / <span class="topage"/>
+        </div>
+        <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-center text-muted" style="margin-top: 5px;">
+            <span t-out="o.name">(document name)</span>
         </div>
     </div>
-    <div t-if="company.logo or company.report_header or o.pdf_logo" class="row zero_min_height">
-        <div class="col-12">
-            <div style="border-bottom: 1px solid black;"/>
-        </div>
-    </div>
-</t>
-
-
-            <div class="row">
-                <div class="col-6" name="company_address">
-                    <ul class="list-unstyled" name="company_address_list">
-                        <li t-if="company.is_company_details_empty"><span t-field="company.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'>
-                            <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
-                                <strong>Company address block</strong>
-                                <div>Contains the company address.</div>
-                            </div>
-                        </span></li>
-                        <li t-else="">
-                            <span t-field="company.company_details">
-                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
-                                    <strong>Company details block</strong>
-                                    <div>Contains the company details.</div>
-                                </div>
-                            </span>
-                        </li>
-                        <li t-if="not forced_vat"/>
-                        <li t-else="">
-                            <t t-esc="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
-                            <span t-esc="forced_vat">US12345671</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
-            <div class="pt-5">
-                <!-- This div ensures that the address is not cropped by the header. -->
-                <t t-call="web.address_layout"/>
-            </div>
-            <t t-out="0"/>
-        </div>
-
-        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
-            <div class="text-center" style="border-top: 1px solid black;">
-                <ul class="list-inline mb4">
-                    <div t-field="company.report_footer"/>
-                </ul>
-
-                <div t-if="report_type == 'pdf'" class="text-muted">
-                    Page: <span class="page"/> / <span class="topage"/>
-                </div>
-                <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-muted">
-                    <span t-out="o.name">(document name)</span>
-                </div>
-            </div>
-        </div>
-    </template>
+</template>
 
     <!-- Public api: layout to t-call from reports -->
 
@@ -96,7 +90,7 @@
 
 
  <template id="report_salequotation_document">
-    <t t-call="web.external_layout">
+    <t t-call="web.external_layout" >
       <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
       <t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat"/>
       <t t-set="address">
@@ -130,9 +124,13 @@
 <!--      </t>-->
 <t t-set="company" t-value="doc.company_id or env.company"/>
 <t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
-<!--<div class="page" t-att-style="'background-image: url(%s); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.1;' % logo_base64">-->
+<div class="page" t-attf-style="background-image:url('/nn_commercial_docs/static/img/img.png'); background-size:195mm 282mm; width:195mm; height:250mm; background-repeat:no-repeat; background-position: center; background-blend-mode: lighten; background-color: rgba(255, 255, 255, 0.99); border: none;">
+  <style>
 
-      <div class="page">
+  </style>
+<!--      <div class="page" style="position: relative;">-->
+        <!-- Background logo in middle-left -->
+
         <div class="oe_structure"/>
 
         <h2 class="mt-4">
