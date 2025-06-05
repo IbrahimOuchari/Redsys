@@ -2,17 +2,23 @@
 <odoo>
  <template id="web.external_layout_standard">
         <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
-            <div class="row">
-                <div class="col-3 mb4">
-                    <img t-if="o.pdf_logo and company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
-                </div>
-                <div class="col-9 text-end" style="margin-top:22px;" t-if="company.report_header" t-field="company.report_header" name="moto">Company tagline</div>
-            </div>
-            <div t-if="company.logo or company.report_header" class="row zero_min_height">
-                <div class="col-12">
-                    <div style="border-bottom: 1px solid black;"/>
-                </div>
-            </div>
+            <t t-if="o.pdf_logo">
+    <div class="row">
+        <div class="col-3 mb4">
+            <img t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+        </div>
+        <div class="col-9 text-end" style="margin-top:22px;">
+            <span t-if="company.report_header" t-field="company.report_header" name="moto">Company tagline</span>
+        </div>
+    </div>
+    <div t-if="company.logo or company.report_header or o.pdf_logo" class="row zero_min_height">
+        <div class="col-12">
+            <div style="border-bottom: 1px solid black;"/>
+        </div>
+    </div>
+</t>
+
+
             <div class="row">
                 <div class="col-6" name="company_address">
                     <ul class="list-unstyled" name="company_address_list">
