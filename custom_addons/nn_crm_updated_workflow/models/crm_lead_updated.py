@@ -146,7 +146,12 @@ class CrmUpdatedWorkflow(models.Model):
 
         # 🔍 Filtrer les lignes avec produits physiques uniquement
         valid_lines = self.final_product_list_ids.filtered(
-            lambda line: line.product_id and line.product_id.detailed_type != 'service'
+            lambda line: (
+                    line.product_id and (
+                    line.product_id.detailed_type != 'service' or
+                    (line.product_id.detailed_type == 'service' and line.rfq_service)
+            )
+            )
         )
 
         if not valid_lines:

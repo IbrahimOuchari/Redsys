@@ -30,7 +30,7 @@ class FinalProductList(models.Model):
         string="Product Type",
         store=True
     )
-
+    rfq_service = fields.Boolean(string="RFQ service", default=False)
     @api.onchange('product_id')
     def _onchange_product_id(self):
         for rec in self:
