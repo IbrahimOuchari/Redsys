@@ -16,7 +16,7 @@
         <field name="arch" type="xml">
             <!-- Ajouter une alerte dans la vue de la facture -->
             <xpath expr="//header" position="before">
-                <field name="is_payment_delayed" invisible="0" />
+                <field name="is_payment_delayed" invisible="1" />
                 <div class="oe_button_box" invisible="not is_payment_delayed">
                     <div class="alert alert-danger" >
                         <strong>Attention !</strong> Cette facture est en retard de paiement.

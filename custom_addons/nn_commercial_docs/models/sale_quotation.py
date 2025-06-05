@@ -6,3 +6,4 @@ class InheritSaleQuotation(models.Model):
 
     def _get_order_lines_to_report(self):
         return self.order_line.filtered(lambda line: not line.display_type)
+    pdf_logo = fields.Boolean(string="PDF Logo")

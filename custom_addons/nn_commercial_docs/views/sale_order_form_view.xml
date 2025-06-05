@@ -1,0 +1,15 @@
+<!-- File: views/inherited_sale_order_form.xml -->
+<odoo>
+    <record id="inherited_sale_order_form" model="ir.ui.view">
+        <field name="name">sale.order.form.inherited</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+       <xpath expr="//field[@name='quotation_seq']" position="after">
+           <field name="pdf_logo" widget="boolean_toggle"/>
+       </xpath>
+
+        </field>
+    </record>
+</odoo>

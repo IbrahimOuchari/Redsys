@@ -18,9 +18,14 @@ This module customizes the invoice reports in Odoo 17:
         'views/account_move_form.xml',
         'reports/account_invoice_report_templates.xml',
         'reports/sale_order_report.xml',
+        'reports/purchase_quotation_template.xml',
+        'reports/purchase_order_report.xml',
         # 'reports/custom_invoice_templates.xml',
         'reports/sale_quotation_report.xml',
         'views/res_company_form.xml',
+        'views/sale_order_form_view.xml',
+        'views/purchase_rfq_form_view.xml',
+        'views/purchase_order_form_view.xml',
     ],
 
 

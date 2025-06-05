@@ -125,9 +125,7 @@
 <t t-set="company" t-value="doc.company_id or env.company"/>
 <t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
 <div class="page" t-attf-style="background-image:url('/nn_commercial_docs/static/img/img.png'); background-size:195mm 282mm; width:195mm; height:250mm; background-repeat:no-repeat; background-position: center; background-blend-mode: lighten; background-color: rgba(255, 255, 255, 0.99); border: none;">
-  <style>
 
-  </style>
 <!--      <div class="page" style="position: relative;">-->
         <!-- Background logo in middle-left -->
 

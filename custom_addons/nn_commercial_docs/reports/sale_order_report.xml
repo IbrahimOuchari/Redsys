@@ -37,7 +37,9 @@
                 </t>
             </t>
         </t>
-        <div class="page">
+<t t-set="company" t-value="doc.company_id or env.company"/>
+<t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
+<div class="page" t-attf-style="background-image:url('/nn_commercial_docs/static/img/img.png'); background-size:195mm 282mm; width:195mm; height:250mm; background-repeat:no-repeat; background-position: center; background-blend-mode: lighten; background-color: rgba(255, 255, 255, 0.99); border: none;">
             <div class="oe_structure"/>
             <h2 class="mt-4">
                 <span t-if="env.context.get('proforma', False) or is_pro_forma">Pro-Forma Invoice # </span>

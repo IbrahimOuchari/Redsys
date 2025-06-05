@@ -1,0 +1,14 @@
+<odoo>
+    <record id="inherited_purchase_rfq_form" model="ir.ui.view">
+        <field name="name">purchase.rfq.form.inherited</field>
+        <field name="model">purchase.rfq</field>
+        <field name="inherit_id" ref="purchase.purchase_rfq_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="pdf_logo" widget="boolean_toggle" string="Afficher le logo PDF"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

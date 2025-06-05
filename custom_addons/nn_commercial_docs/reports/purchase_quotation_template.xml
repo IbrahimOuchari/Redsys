@@ -1,0 +1,292 @@
+<odoo>
+    <!--  Configuration du format papier  -->
+    <record id="paperformat_purchasequotation_portrait" model="report.paperformat">
+        <field name="name">Purshase Order Portrait</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>
+    </record>
+<!--    <template id="report_purchasequotation_document">-->
+<!--        <t t-call="web.external_layout">-->
+
+<!--            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>-->
+<!--            <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> &lt;!&ndash; So that it appears in the footer of the report instead of the company VAT if it's set &ndash;&gt;-->
+<!--            <t t-set="address">-->
+<!--                <div t-field="o.partner_id"-->
+<!--                     t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>-->
+<!--            </t>-->
+
+<!--            &lt;!&ndash; Remove the problematic section completely &ndash;&gt;-->
+<!--            &lt;!&ndash; We'll set an empty information_block just to satisfy the external layout &ndash;&gt;-->
+<!--            <t t-set="information_block" t-value="''"/>-->
+
+<!--            <div class="page">-->
+<!--                <div class="oe_structure"/>-->
+
+<!--                &lt;!&ndash; Header section with logo and company info &ndash;&gt;-->
+<!--                <div class="row mb-4">-->
+<!--                    <div class="col-6">-->
+<!--                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"-->
+<!--                             style="max-height: 100px; max-width: 300px;"-->
+<!--                             alt="Company Logo"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-6 text-right">-->
+<!--                        <h3 t-field="o.company_id.name"/>-->
+<!--                        <div t-field="o.company_id.partner_id"-->
+<!--                             t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": True, "phone_icons": True}'/>-->
+<!--                        <div t-if="o.company_id.vat">VAT: <span t-field="o.company_id.vat"/></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Partner information &ndash;&gt;-->
+<!--                <div class="row mb-4">-->
+<!--                    <div class="col-6">-->
+<!--                        <strong>Vendor:</strong>-->
+<!--                        <div t-field="o.partner_id"-->
+<!--                             t-options='{"widget": "contact", "fields": ["address", "name", "phone", "email", "vat"], "no_marker": True, "phone_icons": True}'/>-->
+<!--                    </div>-->
+<!--                    <div class="col-6">-->
+<!--                        <strong>Delivery Address:</strong>-->
+<!--                        <div t-field="o.company_id.partner_id"-->
+<!--                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <h2 class="mt-4 text-center">Request for Quotation <span t-field="o.name"/></h2>-->
+
+<!--                &lt;!&ndash; Order information &ndash;&gt;-->
+<!--                <div class="row mt-4 mb-4">-->
+<!--                    <div class="col-auto">-->
+<!--                        <strong>RFQ Date:</strong>-->
+<!--                        <span t-field="o.date_order" t-options='{"widget": "date"}' t-if="o.date_order"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-auto" t-if="o.user_id">-->
+<!--                        <strong>Buyer:</strong>-->
+<!--                        <span t-field="o.user_id"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-auto" t-if="o.incoterm_id">-->
+<!--                        <strong>Incoterm:</strong>-->
+<!--                        <span t-field="o.incoterm_id.code"/>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <table class="table table-sm mt-4">-->
+<!--                    <thead style="display: table-row-group">-->
+<!--                        <tr>-->
+<!--                            <th name="th_description"><strong>Description</strong></th>-->
+<!--                            <th name="th_expected_date" class="text-center"><strong>Expected Date</strong></th>-->
+<!--                            <th name="th_quantity" class="text-end"><strong>Qty</strong></th>-->
+<!--                        </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                        <t t-foreach="o.order_line" t-as="order_line">-->
+<!--                            <tr t-att-class="'bg-200 fw-bold o_line_section' if order_line.display_type == 'line_section' else 'fst-italic o_line_note' if order_line.display_type == 'line_note' else ''">-->
+<!--                                <t t-if="not order_line.display_type">-->
+<!--                                    <td id="product">-->
+<!--                                        <span t-field="order_line.name"/>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-center">-->
+<!--                                        <span t-field="order_line.date_planned"/>-->
+<!--                                    </td>-->
+<!--                                    <td class="text-end">-->
+<!--                                        <span t-field="order_line.product_qty"/>-->
+<!--                                        <span t-field="order_line.product_uom" groups="uom.group_uom"/>-->
+<!--                                        <span t-if="order_line.product_packaging_id">-->
+<!--                                            (<span t-field="order_line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="order_line.product_packaging_id"/>)-->
+<!--                                        </span>-->
+<!--                                    </td>-->
+<!--                                </t>-->
+<!--                                <t t-else="">-->
+<!--                                    <td colspan="99" id="section">-->
+<!--                                        <span t-field="order_line.name"/>-->
+<!--                                    </td>-->
+<!--                                </t>-->
+<!--                            </tr>-->
+<!--                        </t>-->
+<!--                    </tbody>-->
+<!--                </table>-->
+
+<!--                <p t-field="o.notes" class="mt-4"/>-->
+
+<!--                &lt;!&ndash; Signature section &ndash;&gt;-->
+<!--                <div class="row mt-5">-->
+<!--                    <div class="col-6">-->
+<!--                        <p><span t-field="o.company_id.name"/>:</p>-->
+<!--                        <div style="height: 70px;"></div>-->
+
+<!--                    </div>-->
+<!--                    <div class="col-6">-->
+<!--                        <p><span t-field="o.partner_id.name"/>:</p>-->
+<!--                        <div style="height: 70px;"></div>-->
+
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                <div class="oe_structure"/>-->
+<!--            </div>-->
+<!--        </t>-->
+<!--    </template>-->
+    <template id="report_rfq_template">
+        <t t-call="web.external_layout">
+
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+            <t t-set="address">
+                <div t-field="o.partner_id"
+                     t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
+            </t>
+
+            <!-- Remove the problematic section completely -->
+            <!-- We'll set an empty information_block just to satisfy the external layout -->
+            <t t-set="information_block" t-value="''"/>
+
+<t t-set="company" t-value="o.company_id or env.company"/>
+<t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
+<div class="page" t-attf-style="background-image:url('/nn_commercial_docs/static/img/img.png'); background-size:195mm 282mm; width:195mm; height:250mm; background-repeat:no-repeat; background-position: center; background-blend-mode: lighten; background-color: rgba(255, 255, 255, 0.99); border: none;">
+                <div class="oe_structure"/>
+
+                <!-- Header section with logo and company info -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
+                             style="max-height: 100px; max-width: 300px;"
+                             alt="Company Logo"/>
+                    </div>
+                    <div class="col-6 text-right">
+                        <h3 t-field="o.company_id.name"/>
+                        <div t-field="o.company_id.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": True, "phone_icons": True}'/>
+                        <div t-if="o.company_id.vat">VAT:
+                            <span t-field="o.company_id.vat"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partner information -->
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <strong>Vendor:</strong>
+                        <div t-field="o.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone", "email", "vat"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Delivery Address:</strong>
+                        <div t-field="o.company_id.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </div>
+
+                <h2 class="mt-4 text-center">Request for Quotation
+                    <span t-field="o.name"/>
+                </h2>
+
+                <!-- Order information -->
+                <div class="row mt-4 mb-4">
+                    <div class="col-auto">
+                        <strong>RFQ Date:</strong>
+                        <span t-field="o.date_order" t-options='{"widget": "date"}' t-if="o.date_order"/>
+                    </div>
+                    <div class="col-auto">
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <table class="table table-sm mt-4">
+                    <thead style="display: table-row-group">
+                        <tr>
+                            <th name="th_name">
+                                <strong>Name</strong>
+                            </th>
+                            <th name="th_description">
+                                <strong>Description</strong>
+                            </th>
+                            <th name="th_barcode">
+                                <strong>PN</strong>
+                            </th>
+
+                            <th name="th_quantity" class="text-end">
+                                <strong>Qty</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.order_line" t-as="order_line">
+                            <tr t-att-class="'bg-200 fw-bold o_line_section' if order_line.display_type == 'line_section' else 'fst-italic o_line_note' if order_line.display_type == 'line_note' else ''">
+                                <t t-if="not order_line.display_type">
+                                    <td id="product">
+                                        <span t-field="order_line.name"/>
+                                    </td>
+                                    <td id="product">
+                                        <span t-field="order_line.product_id.description_purchase"/>
+                                    </td>
+                                    <td id="product">
+                                        <span t-field="order_line.barcode"/>
+                                    </td>
+
+
+                                    <td class="text-end">
+                                        <span t-field="order_line.product_qty"/>
+                                        <span t-field="order_line.product_uom" groups="uom.group_uom"/>
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td colspan="99" id="section">
+                                        <span t-field="order_line.name"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <!-- Signature section -->
+                <div class="row mt-5">
+                    <div class="col-6">
+                        <p><span t-field="o.company_id.name"/>:
+                        </p>
+                        <div style="height: 70px;"></div>
+                    </div>
+                    <div class="col-6">
+                        <p><span t-field="o.partner_id.name"/>:
+                        </p>
+                        <div style="height: 70px;"></div>
+                    </div>
+                </div>
+
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_purchasequotation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="nn_commercial_docs.report_rfq_template" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Add this to register the report action -->
+<record id="purchase.action_report_purchasequotation" model="ir.actions.report">
+    <field name="name">Request for Quotation</field>
+    <field name="model">purchase.rfq</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">nn_purchase_updated_workflow.report_purchasequotation</field>
+    <field name="report_file">nn_purchase_updated_workflow.report_purchasequotation</field>
+    <field name="paperformat_id" ref="paperformat_purchasequotation_portrait"/>
+    <field name="binding_model_id" ref="model_purchase_rfq"/>
+    <field name="binding_type">report</field>
+        <field name="print_report_name">(object.name or 'Draft') + ' - RFQ'</field>
+
+    <!-- 📝 Ceci permet d'utiliser le champ `name` comme nom de fichier -->
+</record>
+
+</odoo>
