@@ -17,7 +17,7 @@ class CrmLeadPointEstimationProduct(models.Model):
 
     # Quantité & Prix en Euro
     quantity = fields.Integer(string="Quantité", required=True)
-    prix_unitaire = fields.Float(string="PU(€)", required=True, digits=(12, 2))
+    prix_unitaire = fields.Float(string="PU(€)", required=True, digits=(12, 3))
     estimation_transport_devis = fields.Float(string="Est Transport (€)", digits=(12, 2))
     total_devis = fields.Float(string="Total(€)", compute="_compute_total_devis", store=True, digits=(12, 2))
 

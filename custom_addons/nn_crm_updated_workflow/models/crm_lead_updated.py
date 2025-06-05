@@ -164,7 +164,7 @@ class CrmUpdatedWorkflow(models.Model):
                 'order_id': purchase_rfq.id,
                 'product_id': rfq_line.product_id.product_variant_id.id,
                 'barcode': rfq_line.barcode,
-                'name': rfq_line.description,
+                'name': rfq_line.product_id.name,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
                 'price_unit': rfq_line.price_unit or 0.0,
