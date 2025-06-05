@@ -128,6 +128,10 @@
 <!--          </t>-->
 <!--        </t>-->
 <!--      </t>-->
+<t t-set="company" t-value="doc.company_id or env.company"/>
+<t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
+<!--<div class="page" t-att-style="'background-image: url(%s); background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0.1;' % logo_base64">-->
+
       <div class="page">
         <div class="oe_structure"/>
 
