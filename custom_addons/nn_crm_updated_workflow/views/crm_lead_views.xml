@@ -106,20 +106,20 @@
                             <field name="quantity" width="100px"/>
                             <field name="prix_unitaire" width="100px"/>
                             <field name="estimation_transport_devis" width="100px"/>
-                            <field name="total_devis" width="100px"/>
+                            <field name="total_devis" width="100px" sum="Prix Tot devis"/>
                             <field name="taux_change" width="100px" optional="hide"/>
-                            <field name="total_dinar" width="100px"/>
-                            <field name="estimation_transport_dinar" width="100px"/>
-                            <field name="taux_dd_id" width="100px"/>
-                            <field name="fee_dd" width="100px"/>
-                            <field name="taux_change" width="100px"/>
-                            <field name="transit" width="100px"/>
-                            <field name="cert" width="100px"/>
-                            <field name="prix_revient" width="100px"/>
-                            <field name="margin_percentage" width="100px"/>
-                            <field name="margin" width="100px"/>
-                            <field name="prix_final" width="100px"/>
-                            <field name="price_unit" width="100px"/>
+                            <field name="total_dinar" width="100px" sum="Prix Tot DT"/>
+                            <field name="estimation_transport_dinar" width="100px" sum="Tot Transport DT"/>
+                            <field name="taux_dd_id" width="100px" widget="percentage" />
+                            <field name="fee_dd" width="100px" sum="Tot DD"/>
+                            <field name="taux_change" width="100px" widget="percentage"/>
+                            <field name="transit" width="100px" sum="Tot Transit DT"/>
+                            <field name="cert" width="100px" sum="Tot Cert DT"/>
+                            <field name="prix_revient" width="100px" sum="Tot Prix Revient"/>
+                            <field name="margin_percentage" width="100px" widget="percentage" />
+                            <field name="margin" width="100px" sum="Tot Margin" />
+                            <field name="prix_final" width="100px" sum="Tot Prix Final DT"/>
+                            <field name="price_unit" width="100px" />
                         </tree>
                         <form>
                             <sheet>
