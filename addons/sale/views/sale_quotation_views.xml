@@ -178,7 +178,7 @@
 
                     <button name="action_quotation_send" id="send_by_email_primary" string="Send by Email" type="object"
                             data-hotkey="g"
-                            invisible="state != 'draft'" class="btn-primary"
+                            invisible="state not in ('draft', 'sent')" class="btn-primary"
                             context="{'validate_analytic': True}"/>
                     <button name="action_confirm" id="action_confirm" data-hotkey="q"
                             string="Confirm" class="btn-primary" type="object" context="{'validate_analytic': True}"

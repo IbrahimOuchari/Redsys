@@ -149,4 +149,17 @@ class PurchaseRFQUpdatedWorkflow(models.Model):
     def action_confirm_sale(self):
         for rec in self:
             if not rec.sale_quotation_confirmed:
+                for line in rec.order_line:
+                    if line.price_unit <= 0:
+                        return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'title': 'Prix Invalide',
+                                'message': "Le prix unitaire ne peut pas être inférieur ou égal à zéro.",
+                                'type': 'warning',  # options: success, warning, danger, info
+                                'sticky': False,  # stays until clicked if True
+                            }
+                        }
+
                 rec.sale_quotation_confirmed = True

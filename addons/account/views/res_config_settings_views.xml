@@ -147,7 +147,7 @@
                                 <field name="module_account_intrastat" widget="upgrade_boolean"/>
                             </setting>
                             <setting id="default_incoterm" string="Default Incoterm" help="Default Incoterm of your company">
-                                <field name="incoterm_id"/>
+                                <field name="incoterm_id" options="{'no_create': True}"/>
                             </setting>
                             <setting id="show_sale_receipts" help="Activate to create sale receipt">
                                 <field name="group_show_sale_receipts"/>

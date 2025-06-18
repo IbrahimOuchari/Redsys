@@ -97,40 +97,108 @@ class CrmUpdatedWorkflow(models.Model):
 
                 # Scenario 2: Line has no barcode - always create new product
                 else:
-                    # Create new product without barcode
-                    new_product = self.env['product.template'].create({
-                        'name': line.name or f'New Product - {line.description or "Unnamed"}',
-                        # No barcode field since it's empty
-                        'uom_id': line.unit_of_measure_id.id,
-                        'taxes_id': [(6, 0, line.taux_tva.ids)] if line.taux_tva else False,
-                        'uom_po_id': line.unit_of_measure_id.id,
-                        'type': line.detailed_type,
-                        'detailed_type': line.detailed_type,
-                        'list_price': 0.0,
-                        'description_purchase': line.description,
-                    })
-
                     final_lines.append((0, 0, {
-                        'barcode': '',  # Empty barcode
-                        'product_id': new_product.id,
+                        'barcode': '',  # ou barcode vide
+                        'product_id': line.product_id.id,
                         'description': line.description,
                         'quantity': line.quantity,
-                        'uom_id': new_product.uom_id.id,
-                        'price_unit': new_product.list_price,
+                        'uom_id': line.unit_of_measure_id.id,
                     }))
-
-                # Update the overall product_found flag
-                if line_product_found:
                     product_found = True
+
+
 
             # Update the final product list
             lead.final_product_list_ids = [(5, 0, 0)] + final_lines
             lead.final_product_list_generated = True
 
             # Call the notification function with appropriate message
-            return self.notify_product_status(product_found)
 
         return None
+    # def action_generate_final_product_lines(self):
+    #     for lead in self:
+    #         final_lines = []
+    #         product_found = False  # Flag to track if any product is found
+    #
+    #         for line in lead.initial_product_list_ids:
+    #             barcode = line.barcode
+    #             product = None
+    #             line_product_found = False  # Track if this specific line's product exists
+    #
+    #             # Scenario 1: Line has barcode - search for existing product
+    #             if barcode:
+    #                 product = self.env['product.template'].search([('barcode', '=', barcode)], limit=1)
+    #
+    #                 if product:
+    #                     # Existing product found - use it
+    #                     final_lines.append((0, 0, {
+    #                         'barcode': barcode,
+    #                         'product_id': product.id,
+    #                         'description': line.description,
+    #                         'quantity': line.quantity,
+    #                         'uom_id': product.uom_id.id,
+    #                         'price_unit': product.list_price,
+    #                     }))
+    #                     line_product_found = True
+    #                 else:
+    #                     # No existing product with this barcode - create new one
+    #                     new_product = self.env['product.template'].create({
+    #                         'name': line.name ,
+    #                         'barcode': barcode,
+    #                         'uom_id': line.unit_of_measure_id.id,
+    #                         'taxes_id': [(6, 0, line.taux_tva.ids)] if line.taux_tva else False,
+    #                         'uom_po_id': line.unit_of_measure_id.id,
+    #                         'type': line.detailed_type,
+    #                         'detailed_type': line.detailed_type,
+    #                         'list_price': 0.0,
+    #                         'description_purchase': line.description,
+    #                     })
+    #
+    #                     final_lines.append((0, 0, {
+    #                         'barcode': barcode,
+    #                         'product_id': new_product.id,
+    #                         'description': line.description,
+    #                         'quantity': line.quantity,
+    #                         'uom_id': new_product.uom_id.id,
+    #                         'price_unit': new_product.list_price,
+    #                     }))
+    #
+    #             # Scenario 2: Line has no barcode - always create new product
+    #             else:
+    #                 # Create new product without barcode
+    #                 new_product = self.env['product.template'].create({
+    #                     'name': line.name ,
+    #                     # No barcode field since it's empty
+    #                     'uom_id': line.unit_of_measure_id.id,
+    #                     'taxes_id': [(6, 0, line.taux_tva.ids)] if line.taux_tva else False,
+    #                     'uom_po_id': line.unit_of_measure_id.id,
+    #                     'type': line.detailed_type,
+    #                     'detailed_type': line.detailed_type,
+    #                     'list_price': 0.0,
+    #                     'description_purchase': line.description,
+    #                 })
+    #
+    #                 final_lines.append((0, 0, {
+    #                     'barcode': line.barcode,  # Empty barcode
+    #                     'product_id': new_product.id,
+    #                     'description': line.description,
+    #                     'quantity': line.quantity,
+    #                     'uom_id': new_product.uom_id.id,
+    #                     'price_unit': new_product.list_price,
+    #                 }))
+    #
+    #             # Update the overall product_found flag
+    #             if line_product_found:
+    #                 product_found = True
+    #
+    #         # Update the final product list
+    #         lead.final_product_list_ids = [(5, 0, 0)] + final_lines
+    #         lead.final_product_list_generated = True
+    #
+    #         # Call the notification function with appropriate message
+    #         return self.notify_product_status(product_found)
+    #
+    #     return None
     def action_create_rfq(self):
         self.ensure_one()
 
@@ -144,14 +212,9 @@ class CrmUpdatedWorkflow(models.Model):
         if not self.partner_id.email:
             raise UserError("Le client doit avoir au moins une adresse e-mail.")
 
-        # 🔍 Filtrer les lignes avec produits physiques uniquement
+        # 🔍 Filtrer les lignes avec produits physiques uniquement (exclut tous les services)
         valid_lines = self.final_product_list_ids.filtered(
-            lambda line: (
-                    line.product_id and (
-                    line.product_id.detailed_type != 'service' or
-                    (line.product_id.detailed_type == 'service' and line.rfq_service)
-            )
-            )
+            lambda line: line.product_id and line.product_id.detailed_type != 'service'
         )
 
         if not valid_lines:
@@ -172,7 +235,6 @@ class CrmUpdatedWorkflow(models.Model):
                 'name': rfq_line.product_id.name,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
-                'price_unit': rfq_line.price_unit or 0.0,
             })
 
         self.rfq_created = True

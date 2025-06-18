@@ -44,7 +44,7 @@
             </xpath>
 
 
-            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
                 <field name="price_unit" string="Prix Unitaire" invisible="state in ('draft','sent')"/>
             </xpath>
 

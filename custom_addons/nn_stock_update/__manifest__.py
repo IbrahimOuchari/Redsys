@@ -1,6 +1,6 @@
 {
     'name': 'Stock Advanced Features',
-    'version': '1.2',
+    'version': '17.1',
     'category': 'Inventory',
     'summary': 'Ajout de fonctionnalités avancées pour le module Stock',
     'description': '''

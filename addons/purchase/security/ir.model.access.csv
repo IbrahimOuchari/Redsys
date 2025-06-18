@@ -42,7 +42,3 @@ access_purchase_rfq,purchase.rfq user,model_purchase_rfq,group_purchase_user,1,1
 access_purchase_rfq_manager,purchase.rfq,model_purchase_rfq,group_purchase_manager,1,1,1,1
 access_purchase_rfq_line,purchase.rfq.line user,model_purchase_rfq_line,group_purchase_user,1,1,1,1
 access_purchase_rfq_line_manager,purchase.rfq.line,model_purchase_rfq_line,group_purchase_manager,1,1,1,1
-
-
-
-

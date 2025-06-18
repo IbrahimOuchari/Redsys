@@ -4,7 +4,6 @@ from collections import defaultdict
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-import copy
 
 from markupsafe import escape, Markup
 from werkzeug.urls import url_encode
@@ -14,7 +13,6 @@ from odoo.osv import expression
 from odoo.tools import format_amount, format_date, formatLang, groupby
 from odoo.tools.float_utils import float_is_zero
 from odoo.exceptions import UserError, ValidationError
-import logging
 
 
 class PurchaseRfq(models.Model):
@@ -33,14 +31,9 @@ class PurchaseRfq(models.Model):
     partner_ref = fields.Char('Vendor Reference', copy=False, )
     date_order = fields.Date('Date RFQ', required=True, index=True, copy=False,
                              default=fields.Date.context_today, )
-    partner_id = fields.Many2one(
-        'res.partner',
-        string='Vendor',
-        change_default=True,
-        tracking=True,
-        check_company=True,
-        help="You can find a vendor by its Name, TIN, Email or Internal Reference"
-    )
+    partner_id = fields.Many2one('res.partner', string='Vendor', change_default=True, tracking=True,
+                                 check_company=True, domain=[('is_supplier', '=', True)],
+                                 help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     state = fields.Selection([
         ('draft', 'Draft'),
         ('sent', 'RFQ Sent'),
@@ -92,9 +85,9 @@ class PurchaseRfq(models.Model):
     purchase_order_count = fields.Integer(string='Purchase Order Count', compute='_compute_po_count')
     logo = fields.Binary(string='Logo', related='company_id.logo',
                          store=True)
+
     # company_id = fields.Many2one('res.company', string='Company',
     #                              default=lambda self: self.env.company)
-
 
     def _compute_po_count(self):
         for rfq in self:
@@ -199,21 +192,21 @@ class PurchaseRfq(models.Model):
                 line.date_planned = line._get_date_planned(seller)
         return new_po
 
-    # def _must_delete_date_planned(self, field_name):
-    #     # To be overridden
-    #     return field_name == 'order_line'
-    #
-    # def onchange(self, values, field_names, fields_spec):
-    #     """
-    #     Override onchange to NOT update all date_planned on PO lines when
-    #     date_planned on PO is updated by the change of date_planned on PO lines.
-    #     """
-    #     result = super().onchange(values, field_names, fields_spec)
-    #     if any(self._must_delete_date_planned(field) for field in field_names) and 'value' in result:
-    #         for line in result['value'].get('order_line', []):
-    #             if line[0] == Command.UPDATE and 'date_planned' in line[2]:
-    #                 del line[2]['date_planned']
-    #     return result
+    def _must_delete_date_planned(self, field_name):
+        # To be overridden
+        return field_name == 'order_line'
+
+    def onchange(self, values, field_names, fields_spec):
+        """
+        Override onchange to NOT update all date_planned on PO lines when
+        date_planned on PO is updated by the change of date_planned on PO lines.
+        """
+        result = super().onchange(values, field_names, fields_spec)
+        if any(self._must_delete_date_planned(field) for field in field_names) and 'value' in result:
+            for line in result['value'].get('order_line', []):
+                if line[0] == Command.UPDATE and 'date_planned' in line[2]:
+                    del line[2]['date_planned']
+        return result
 
     def _get_report_base_filename(self):
         self.ensure_one()
@@ -324,10 +317,10 @@ class PurchaseRfq(models.Model):
     # ACTIONS
     # ------------------------------------------------------------
 
+
     def action_rfq_send(self):
         '''
-        This function opens a window to compose an email, with the EDI purchase template message loaded by default.
-        It fetches recipients from `suppliers_ids` instead of `partner_id`.
+        This function opens a window to compose an email, with the edi purchase template message loaded by default
         '''
         self.ensure_one()
         ir_model_data = self.env['ir.model.data']
@@ -342,8 +335,6 @@ class PurchaseRfq(models.Model):
             compose_form_id = ir_model_data._xmlid_lookup('mail.email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
-
-        # Build context
         ctx = dict(self.env.context or {})
         ctx.update({
             'default_model': 'purchase.rfq',
@@ -353,11 +344,12 @@ class PurchaseRfq(models.Model):
             'default_email_layout_xmlid': "mail.mail_notification_layout_with_responsible_signature",
             'force_email': True,
             'mark_rfq_as_sent': True,
-            # ✨ Custom line to populate the recipients with suppliers_ids
             'default_partner_ids': [(6, 0, self.suppliers_ids.ids)],
         })
 
-        # Handle language context
+        # In the case of a RFQ, we want the "View..." button in line with the state of the
+        # object. Therefore, we pass the model description in the context, in the language in which
+        # the template is rendered.
         lang = self.env.context.get('lang')
         if {'default_template_id', 'default_model', 'default_res_id'} <= ctx.keys():
             template = self.env['mail.template'].browse(ctx['default_template_id'])
@@ -365,8 +357,6 @@ class PurchaseRfq(models.Model):
                 lang = template._render_lang([ctx['default_res_id']])[ctx['default_res_id']]
 
         self = self.with_context(lang=lang)
-
-        # Label according to state
         if self.state in ['draft', 'sent']:
             ctx['model_description'] = _('Request for Quotation')
         else:
@@ -383,10 +373,6 @@ class PurchaseRfq(models.Model):
             'context': ctx,
         }
 
-    # def print_quotation(self):
-    #     self.write({'state': "sent"})
-    #     return self.env.ref('purchase.report_purchasequotation').report_action(self)
-
     def print_quotation(self):
         return self.env.ref('purchase.action_report_purchasequotation').report_action(self)
 
@@ -400,34 +386,10 @@ class PurchaseRfq(models.Model):
     def button_cancel(self):
         self.write({'state': 'cancel', 'mail_reminder_confirmed': False})
 
-    # def button_creat_po(self):
-    #     purchase_order = self.env['purchase.order'].create({
-    #         'partner_id': self.partner_id.id,
-    #         'rfq_seq': self.name,
-    #         'partner_ref': self.partner_ref,
-    #         'payment_term_id': self.payment_term_id.id,
-    #         'order_line': [(0, 0, {
-    #             'display_type': line.display_type,
-    #             'product_id': line.product_id.id,
-    #             'name': line.name,
-    #             'product_qty': line.product_qty,
-    #         }) for line in self.order_line],
-    #     })
-    #     self.state = "purchase"
-    #     return {
-    #         'name': 'Purchase Order',
-    #         'view_type': 'form',
-    #         'view_mode': 'form',
-    #         'res_model': 'purchase.order',
-    #         'res_id': purchase_order.id,
-    #         'type': 'ir.actions.act_window',
-    #         'target': 'current', }
-    #     return
 
     def button_creat_po(self):
         purchase_order = self.env['purchase.order'].create({
             'partner_id': self.partner_id.id,
-            'crm_lead_id':self.crm_lead_id.id,
             'rfq_seq': self.name,
             'partner_ref': self.partner_ref,
             'payment_term_id': self.payment_term_id.id,
@@ -808,10 +770,10 @@ class PurchaseRfq(models.Model):
                 'module': 'purchase',
             })
 
+    suppliers_ids = fields.Many2many('res.partner', string='Vendor', change_default=True, tracking=True,
+                                 check_company=True, domain=[('is_supplier', '=', True)])
 
-#         The new suppliers_ids field
-    suppliers_ids = fields.Many2many(
-        'res.partner',
-        string="Tous les Fournisseurs",
-        domain=[('is_supplier', '=', True)]
-    )
+    @api.onchange('suppliers_ids')
+    def _onchange_suppliers_ids(self):
+        for record in self:
+            record.partner_id = False

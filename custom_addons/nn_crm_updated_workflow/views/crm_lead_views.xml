@@ -94,7 +94,6 @@
                             <field name="quantity"/>
                             <field name="uom_id"/>
                             <field name="price_unit"/>
-                            <field name="rfq_service" invisible="detailed_type != 'service'"/>
                         </tree>
                     </field>
                 </page>

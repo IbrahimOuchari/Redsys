@@ -269,11 +269,11 @@
                                 <field name="payment_type" widget="radio" options="{'horizontal': True}"
                                        readonly="state != 'draft'"/>
                                 <field name="partner_id" context="{'default_is_company': True}" string="Customer"
-                                       options="{'no_quick_create': True}"
+                                       options="{'no_create': True}"
                                        invisible="partner_type != 'customer' or is_internal_transfer"
                                        readonly="state != 'draft'"/>
                                 <field name="partner_id" context="{'default_is_company': True}" string="Vendor"
-                                       options="{'no_quick_create': True}"
+                                        options="{'no_create': True}"
                                        invisible="partner_type != 'supplier' or is_internal_transfer"
                                        readonly="state != 'draft'"/>
                                 <label for="amount"/>
@@ -293,7 +293,8 @@
                             <group name="group2">
                                 <field name="journal_id"
                                        domain="[('id', 'in', available_journal_ids)]"
-                                       readonly="state != 'draft'"/>
+                                       readonly="state != 'draft'"
+                                       options="{'no_create': True}"/>
                                 <field name="payment_method_line_id" options="{'no_create': True, 'no_open': True}"
                                        required="1"
                                        readonly="state != 'draft'"/>

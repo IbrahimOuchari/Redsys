@@ -26,16 +26,6 @@ msgstr "# Factures fournisseurs"
 msgid "# of Lines"
 msgstr "# de lignes"
 
-
-#. module: purchase
-#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
-msgid "Financial Details"
-msgstr "Détails Financier"
-
-
-
-
-
 #. module: purchase
 #. odoo-python
 #: code:addons/addons/purchase/models/purchase_order.py:0
@@ -1579,11 +1569,7 @@ msgstr "Double validation du montant"
 #: model:ir.model.fields.selection,name:purchase.selection__purchase_order__state__draft
 #: model_terms:ir.ui.view,arch_db:purchase.view_purchase_rfq_filter
 msgid "Draft"
-msgstr "Demande de prix"
-
-
-
-
+msgstr "Brouillon"
 
 
 
@@ -3154,9 +3140,7 @@ msgstr "Analyse"
 #: model_terms:ir.ui.view,arch_db:purchase.report_purchasequotation_document
 #, python-format
 msgid "Request for Quotation"
-msgstr "Demande de prix"
-
-
+msgstr "Demande de Prix"
 
 #. module: purchase
 #. odoo-python
@@ -3415,6 +3399,7 @@ msgstr "Document d'origine"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_rfq__partner_id
+#: model:ir.model.fields,field_description:purchase.field_purchase_rfq__suppliers_ids
 msgid "Vendor"
 msgstr "Fournisseur"
 
