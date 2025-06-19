@@ -235,6 +235,7 @@ class CrmUpdatedWorkflow(models.Model):
                 'name': rfq_line.product_id.name,
                 'product_qty': rfq_line.quantity,
                 'product_uom': rfq_line.uom_id.id,
+                'price_unit': 0,
             })
 
         self.rfq_created = True

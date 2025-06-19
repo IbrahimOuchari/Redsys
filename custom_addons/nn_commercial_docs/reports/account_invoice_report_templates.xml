@@ -12,7 +12,7 @@
 
 <!--    This is the part of the account Move -->
     <template id="account.report_invoice_document">
-        <t t-call="web.external_layout">
+        <t t-call="nn_commercial_docs.external_layout_new">
             <t t-set="o" t-value="o.with_context(lang=lang)"/>
             <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it
                 appears in the footer of the report instead of the company VAT if it's set -->
@@ -80,8 +80,18 @@
             </div>
             <div class="mt-5 clearfix">
 <t t-set="company" t-value="o.company_id or env.company"/>
-<t t-set="logo_base64" t-value="image_data_uri(company.logo)"/>
-<div class="page" t-attf-style="background-image:url('/nn_commercial_docs/static/img/img.png'); background-size:195mm 282mm; width:195mm; height:250mm; background-repeat:no-repeat; background-position: center; background-blend-mode: lighten; background-color: rgba(255, 255, 255, 0.99); border: none;">
+<t t-set="bg_logo" t-value="image_data_uri(company.background_logo)"/>
+            <div class="page"
+                 t-attf-style="background-image: url('{{ bg_logo }}');
+                   background-size: 290mm auto;
+                   background-repeat: no-repeat;
+                   background-position: -70mm 40mm;
+                   background-blend-mode: lighten;
+                   background-color: rgba(255, 255, 255, 0.99);
+                   width: 195mm;
+                   height: 250mm;
+                   border: none;
+                   opacity: 0.1;">
                     <h2>
                         <span t-if="not proforma"></span>
                         <span t-else="">PROFORMA</span>

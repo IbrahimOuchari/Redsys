@@ -11,10 +11,10 @@ class FinalProductList(models.Model):
     )
     description = fields.Text(string="Description",readonly=False ,store= True)
     quantity = fields.Float(string="Quantity", default=1.0)
-    uom_id = fields.Many2many(
-        related='product_id.taxes_id',
+    uom_id = fields.Many2one(
+        related='product_id.uom_po_id',
         string="Unit of Measure",
-        ondelete='restrict'
+        ondelete='restrict', readonly=False
     )
     price_unit = fields.Float(string="Unit Price")
     lead_id = fields.Many2one(

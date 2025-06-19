@@ -1,0 +1,186 @@
+<odoo>
+
+<!--        <template id="external_layout_standard_quot_modified">-->
+<!--        &lt;!&ndash; HEADER: only logo top left &ndash;&gt;-->
+<!--        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style"-->
+<!--             style="padding-bottom: 10px;">-->
+<!--            <div class="row align-items-start">-->
+<!--                <div class="col-2">-->
+<!--                    <t t-if="o.pdf_logo">-->
+<!--                        <img t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>-->
+<!--                    </t>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Horizontal line below the header &ndash;&gt;-->
+<!--            <div t-if="company.logo or company.report_header or o.pdf_logo" class="row zero_min_height"-->
+<!--                 style="margin-top: 8px;">-->
+<!--                <div class="col-6"> &lt;!&ndash; half width column &ndash;&gt;-->
+<!--                    <div style="border-bottom: 1px solid red; width: 100%;"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--        </div>-->
+<!--        &lt;!&ndash; CONTENT &ndash;&gt;-->
+<!--              &lt;!&ndash; CONTENT &ndash;&gt;-->
+<!--        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"-->
+<!--             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}}); border: none !important; border-left: none !important; border-right: none !important;"-->
+<!--             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"-->
+<!--             t-att-data-oe-lang="o and o.env.context.get('lang')">-->
+
+<!--            <t t-out="0"/>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; FOOTER: three columns above the horizontal line &ndash;&gt;-->
+<!--        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" style="padding-top: 10px;">-->
+<!--            <div class="row" style="font-size: 0.8em; margin-bottom: 5px;">-->
+<!--                &lt;!&ndash; Left: Company name &ndash;&gt;-->
+<!--                <div class="col-4" style="text-align: left;">-->
+<!--                    <span t-field="company.name"/>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Center: Address + phone and fax &ndash;&gt;-->
+<!--                <div class="col-4" style="text-align: center;">-->
+<!--                    <span t-field="company.street"/>,-->
+<!--                    <span t-field="company.city"/>-->
+<!--                    <span t-field="company.zip"/>-->
+<!--                    <br/>-->
+<!--                    <span>-->
+<!--                        <strong>Tél:</strong>-->
+<!--                        <span t-field="company.phone"/>-->
+<!--                    </span>-->
+<!--                    —-->
+<!--                    <span>-->
+<!--                        <strong>Fax:</strong>-->
+<!--                        <span t-field="company.fax"/>-->
+<!--                    </span>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; Right: Email, website, RIB, IBAN &ndash;&gt;-->
+<!--                <div class="col-4" style="text-align: right;">-->
+<!--                    <span>-->
+<!--                        <strong>Email:</strong>-->
+<!--                        <span t-field="company.email"/>-->
+<!--                    </span>-->
+<!--                    <br/>-->
+<!--                    <span>-->
+<!--                        <strong>Site web:</strong>-->
+<!--                        <span t-field="company.website"/>-->
+<!--                    </span>-->
+<!--                    <br/>-->
+<!--                    &lt;!&ndash;                <span><strong>RIB:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].acc_number or ''"/></span><br/>&ndash;&gt;-->
+<!--                    &lt;!&ndash;                <span><strong>IBAN:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].iban or ''"/></span>&ndash;&gt;-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Horizontal line below the info &ndash;&gt;-->
+<!--            <div style="border-top: 40px solid red;"></div>-->
+
+<!--            &lt;!&ndash; Page number and document name &ndash;&gt;-->
+<!--            <div t-if="report_type == 'pdf'" class="text-center text-muted" style="margin-top: 5px;">-->
+<!--                Page:-->
+<!--                <span class="page"/>-->
+<!--                /-->
+<!--                <span class="topage"/>-->
+<!--            </div>-->
+<!--            <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-center text-muted"-->
+<!--                 style="margin-top: 5px;">-->
+<!--                <span t-out="o.name">(document name)</span>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </template>-->
+
+
+
+
+<!--    &lt;!&ndash; Public api: layout to t-call from reports &ndash;&gt;-->
+
+<!--    <template id="external_layout_new_quot">-->
+<!--        <t t-if="not o" t-set="o" t-value="doc"/>-->
+
+<!--        <t t-if="not company">-->
+<!--            &lt;!&ndash; Multicompany &ndash;&gt;-->
+<!--            <t t-if="company_id">-->
+<!--                <t t-set="company" t-value="company_id"/>-->
+<!--            </t>-->
+<!--            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">-->
+<!--                <t t-set="company" t-value="o.company_id.sudo()"/>-->
+<!--            </t>-->
+<!--            <t t-else="else">-->
+<!--                <t t-set="company" t-value="res_company"/>-->
+<!--            </t>-->
+<!--        </t>-->
+
+<!--        <t t-if="company.external_report_layout_id" t-call="{{company.external_report_layout_id.sudo().key}}">-->
+<!--            <t t-out="0"/>-->
+<!--        </t>-->
+<!--        <t t-else="else" t-call="nn_commercial_docs.external_layout_standard_quot_modified">-->
+<!--            <t t-out="0"/>-->
+<!--        </t>-->
+
+<!--    </template>-->
+
+    <template id="external_layout_standard_test">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row">
+                <div class="col-3 mb4">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+                </div>
+                <div class="col-9 text-end" style="margin-top:22px;" t-if="company.report_header" t-field="company.report_header" name="moto">Company tagline</div>
+            </div>
+            <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                <div class="col-12">
+                    <div style="border-bottom: 1px solid black;"/>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5">
+                <!-- This div ensures that the address is not cropped by the header. -->
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border-top: 1px solid black;">
+                <ul class="list-inline mb4">
+                    <div t-field="company.report_footer"/>
+                </ul>
+
+                <div t-if="report_type == 'pdf'" class="text-muted">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+                <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-muted">
+                    <span t-out="o.name">(document name)</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Public api: layout to t-call from reports -->
+
+    <template id="external_layout_test">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+        <t t-call="nn_commercial_docs.external_layout_standard_test"><t t-out="0"/></t>
+
+    </template>
+
+
+
+</odoo>

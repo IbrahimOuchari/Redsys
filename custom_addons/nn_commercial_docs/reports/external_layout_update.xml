@@ -1,0 +1,123 @@
+<odoo>
+
+        <template id="external_layout_standard_modified">
+        <!-- HEADER: only logo top left -->
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style"
+             style="padding-bottom: 10px;">
+            <div class="row align-items-start">
+                <div class="col-2">
+                        <img t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+                </div>
+            </div>
+
+            <!-- Horizontal line below the header -->
+            <div t-if="company.logo or company.report_header or o.pdf_logo" class="row zero_min_height"
+                 style="margin-top: 8px;">
+                <div class="col-6"> <!-- half width column -->
+                    <div style="border-bottom: 1px solid red; width: 100%;"></div>
+                </div>
+            </div>
+
+        </div>
+        <!-- CONTENT -->
+              <!-- CONTENT -->
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}}); border: none !important; border-left: none !important; border-right: none !important;"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+
+            <t t-out="0"/>
+        </div>
+
+        <!-- FOOTER: three columns above the horizontal line -->
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" style="padding-top: 10px;">
+            <div class="row" style="font-size: 0.8em; margin-bottom: 5px;">
+                <!-- Left: Company name -->
+                <div class="col-4" style="text-align: left;">
+                    <span t-field="company.name"/>
+                </div>
+
+                <!-- Center: Address + phone and fax -->
+                <div class="col-4" style="text-align: center;">
+                    <span t-field="company.street"/>,
+                    <span t-field="company.city"/>
+                    <span t-field="company.zip"/>
+                    <br/>
+                    <span>
+                        <strong>Tél:</strong>
+                        <span t-field="company.phone"/>
+                    </span>
+                    —
+                    <span>
+                        <strong>Fax:</strong>
+                        <span t-field="company.fax"/>
+                    </span>
+                </div>
+
+                <!-- Right: Email, website, RIB, IBAN -->
+                <div class="col-4" style="text-align: right;">
+                    <span>
+                        <strong>Email:</strong>
+                        <span t-field="company.email"/>
+                    </span>
+                    <br/>
+                    <span>
+                        <strong>Site web:</strong>
+                        <span t-field="company.website"/>
+                    </span>
+                    <br/>
+                    <!--                <span><strong>RIB:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].acc_number or ''"/></span><br/>-->
+                    <!--                <span><strong>IBAN:</strong> <t t-esc="company.bank_account_ids and company.bank_account_ids[0].iban or ''"/></span>-->
+                </div>
+            </div>
+
+            <!-- Horizontal line below the info -->
+            <div style="border-top: 40px solid red;"></div>
+
+            <!-- Page number and document name -->
+            <div t-if="report_type == 'pdf'" class="text-center text-muted" style="margin-top: 5px;">
+                Page:
+                <span class="page"/>
+                /
+                <span class="topage"/>
+            </div>
+            <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-center text-muted"
+                 style="margin-top: 5px;">
+                <span t-out="o.name">(document name)</span>
+            </div>
+        </div>
+    </template>
+
+
+
+
+    <!-- Public api: layout to t-call from reports -->
+
+    <template id="external_layout_new">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+
+        <t t-if="not company">
+            <!-- Multicompany -->
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+
+
+        <t t-call="nn_commercial_docs.external_layout_standard_modified">
+            <t t-out="0"/>
+        </t>
+
+    </template>
+
+
+
+
+
+</odoo>

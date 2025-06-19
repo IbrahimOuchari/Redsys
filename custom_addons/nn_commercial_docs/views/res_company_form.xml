@@ -7,6 +7,8 @@
             <!-- Locate the phone field and insert fax right after -->
             <xpath expr="//field[@name='phone']" position="after">
                 <field name="fax"/>
+                <field name="background_logo" invisible="0"/>
+
             </xpath>
         </field>
     </record>
