@@ -1,23 +1,10 @@
 <odoo>
-    <template id="report_purchasequotation_document_inherit" inherit_id="purchase.report_purchasequotation_document">
 
-        <!-- Set company to avoid missing variable in custom layout -->
-
-
-        <!-- Optional: remove logo row if you're replacing it -->
-        <xpath expr="//div[@class='row mb-4'][div/img[@t-att-src='image_data_uri(o.company_id.logo)']]" position="replace">
-        </xpath>
-
-    </template>
-
-
-  <template id="report_purchasequotation_new">
-    <t t-set="company" t-value="env.company"/>
-
+<template id="purchase.report_purchasequotation_document">
     <t t-call="nn_commercial_docs.external_layout_new">
-        <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
-        <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
 
+        <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+        <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
         <t t-set="address">
             <div t-field="o.partner_id"
                  t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"], "no_marker": True, "phone_icons": True}'/>
@@ -27,23 +14,23 @@
         <!-- We'll set an empty information_block just to satisfy the external layout -->
         <t t-set="information_block" t-value="''"/>
 
-        <t t-set="company" t-value="o.company_id or env.company"/>
-<t t-set="bg_logo" t-value="company.background_logo and image_data_uri(company.background_logo) or ''"/>
-            <div class="page"
-                 t-attf-style="background-image: url('{{ bg_logo }}');
-                   background-size: 290mm auto;
-                   background-repeat: no-repeat;
-                   background-position: -70mm 40mm;
-                   background-blend-mode: lighten;
-                   background-color: rgba(255, 255, 255, 0.99);
-                   width: 195mm;
-                   height: 250mm;
-                   border: none;
-                   opacity: 0.1;">
+        <div class="page">
             <div class="oe_structure"/>
 
             <!-- Header section with logo and company info -->
-
+            <div class="row mb-4">
+                <div class="col-6">
+                    <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
+                         style="max-height: 100px; max-width: 300px;"
+                         alt="Company Logo"/>
+                </div>
+                <div class="col-6 text-right">
+                    <h3 t-field="o.company_id.name"/>
+                    <div t-field="o.company_id.partner_id"
+                         t-options='{"widget": "contact", "fields": ["address", "phone", "email"], "no_marker": True, "phone_icons": True}'/>
+                    <div t-if="o.company_id.vat">VAT: <span t-field="o.company_id.vat"/></div>
+                </div>
+            </div>
 
             <!-- Partner information -->
             <div class="row mb-4">
@@ -133,27 +120,6 @@
         </div>
     </t>
 </template>
-<template id="report_purchasequotation_fixed">
-    <t t-call="web.html_container">
-        <t t-foreach="docs" t-as="o">
-            <t t-call="nn_commercial_docs.report_purchasequotation_new" t-lang="o.partner_id.lang"/>
-        </t>
-    </t>
-</template>
 
-    <record id="action_report_purchasequotation_new" model="ir.actions.report">
-    <field name="name">Demande de Prix</field> <!-- Appears in Print menu -->
-    <field name="model">purchase.rfq</field> <!-- Correct model: purchase.order -->
-    <field name="report_type">qweb-pdf</field>
-    <field name="report_name">nn_commercial_docs.report_purchasequotation_fixed</field> <!-- module_name.template_id -->
-    <field name="report_file">nn_commercial_docs.report_purchasequotation_fixed</field>
-    <field name="paperformat_id" ref="base.paperformat_euro"/> <!-- Or use your custom paperformat -->
-    <field name="binding_model_id" ref="purchase.model_purchase_rfq"/>
-    <field name="binding_type">report</field>
-</record>
 
-<record id="purchase.action_report_purchasequotation" model="ir.actions.report">
-    <field name="binding_model_id" eval="False"/>
-
-</record>
 </odoo>

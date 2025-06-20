@@ -38,7 +38,7 @@
             </t>
         </t>
 <t t-set="company" t-value="doc.company_id or env.company"/>
-<t t-set="bg_logo" t-value="image_data_uri(company.background_logo)"/>
+<t t-set="bg_logo" t-value="company.background_logo and image_data_uri(company.background_logo) or ''"/>
             <div class="page"
                  t-attf-style="background-image: url('{{ bg_logo }}');
                    background-size: 290mm auto;

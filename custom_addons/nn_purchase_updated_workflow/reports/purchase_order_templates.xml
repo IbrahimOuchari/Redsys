@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--  Configuration du format papier  -->
 
-
-    <template id="report_purchaseorder_document_updated">
-            <t t-set="company" t-value="env.company"/>
-
+    <template id="purchase.report_purchaseorder_document">
     <t t-call="nn_commercial_docs.external_layout_new">
             <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
             <t t-set="address">
@@ -23,8 +19,8 @@
                 </t>
             </t>
 
-<t t-set="company" t-value="o.company_id or env.company"/>
-<t t-set="bg_logo" t-value="company.background_logo and image_data_uri(company.background_logo) or ''"/>
+        <t t-set="company" t-value="o.company_id or env.company"/>
+<t t-set="bg_logo" t-value="image_data_uri(company.background_logo)"/>
             <div class="page"
                  t-attf-style="background-image: url('{{ bg_logo }}');
                    background-size: 290mm auto;
@@ -35,8 +31,10 @@
                    width: 195mm;
                    height: 250mm;
                    border: none;
-                   opacity: 0.1;">                <div class="oe_structure"/>
+                   opacity: 0.1;">
+            <div class="oe_structure"/>               
 
+                <!-- Header section with logo and company info -->
 
 
                 <!-- Partner information -->
@@ -229,35 +227,5 @@
             </div>
         </t>
     </template>
-
-    <template id="report_purchaseorder_fixed">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-call="nn_commercial_docs.report_purchaseorder_document_updated" t-lang="o.partner_id.lang"/>
-            </t>
-        </t>
-    </template>
-
-    <!-- Allow edits (e.g. studio) without changing the often inherited base template -->
-    <template id="document_tax_totals" inherit_id="account.document_tax_totals_template" primary="True"></template>
-
-    <record id="action_report_purchaseorder_new" model="ir.actions.report">
-    <field name="name">Bons de commande </field> <!-- Appears in Print menu -->
-    <field name="model">purchase.order</field> <!-- Correct model: purchase.order -->
-    <field name="report_type">qweb-pdf</field>
-    <field name="report_name">nn_commercial_docs.report_purchaseorder_fixed</field> <!-- module_name.template_id -->
-    <field name="report_file">nn_commercial_docs.report_purchaseorder_fixed</field>
-    <field name="paperformat_id" ref="base.paperformat_euro"/> <!-- Or use your custom paperformat -->
-    <field name="binding_model_id" ref="purchase.model_purchase_order"/>
-    <field name="binding_type">report</field>
-</record>
-
-
-
-
-    <record id="purchase.action_report_purchaseorder" model="ir.actions.report">
-         <field name="binding_model_id" eval="False"/>
-
-    </record>
 
 </odoo>

@@ -39,9 +39,9 @@ class PurchaseRFQUpdatedWorkflow(models.Model):
         ir_model_data = self.env['ir.model.data']
         try:
             if self.env.context.get('send_rfq', False):
-                template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq')[1]
+                template_id = ir_model_data._xmlid_lookup('nn_purchase_updated_workflow.email_template_edi_purchase_rfq_new')[1]
             else:
-                template_id = ir_model_data._xmlid_lookup('purchase.email_template_edi_purchase_rfq_done')[1]
+                template_id = ir_model_data._xmlid_lookup('nn_purchase_updated_workflow.email_template_edi_purchase_rfq_done_new')[1]
         except ValueError:
             template_id = False
         try:

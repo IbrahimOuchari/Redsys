@@ -16,6 +16,7 @@ This module customizes the invoice reports in Odoo 17:
     'data': [
         'views/product_form_view.xml',
         'views/account_move_form.xml',
+        # 'data/purchase_rfq_and_order_email.xml',
         'reports/external_layout_update.xml',
         'reports/external_layout_update_purchase_qot.xml',
         'reports/account_invoice_report_templates.xml',
