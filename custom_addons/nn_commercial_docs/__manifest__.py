@@ -20,6 +20,7 @@ This module customizes the invoice reports in Odoo 17:
         'reports/external_layout_update_purchase_qot.xml',
         'reports/account_invoice_report_templates.xml',
         'reports/sale_order_report.xml',
+        'reports/purchase_rfq_report_template.xml',
         'reports/purchase_order_report_template.xml',
         # 'reports/custom_invoice_templates.xml',
         'reports/sale_quotation_report.xml',
