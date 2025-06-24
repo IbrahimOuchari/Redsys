@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
     <template id="report_saleorder_document_inherit_sale_stock" inherit_id="sale.report_saleorder_document">
-        <xpath expr="//div[@name='informations_date']" position="after">
+        <xpath expr="//div[@name='information_block']" position="after">
             <div class="col-auto col-3 mw-100 mb-2" t-if="doc.incoterm">
                 <strong>Incoterm:</strong>
                 <p t-if="doc.incoterm_location">

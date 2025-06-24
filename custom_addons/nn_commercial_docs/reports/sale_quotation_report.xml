@@ -138,6 +138,21 @@
                         </t>
                     </tbody>
                 </table>
+<t t-if="user.signature">
+    <div class="text-center" style="margin-top: 50px;">
+        <p><strong>Signature</strong></p>
+                            <div widget="html" t-field="user.signature"/>
+
+        <p t-esc="user.name" style="margin-top: 5px;" />
+    </div>
+</t>
+<t t-else="">
+    <div class="text-center" style="margin-top: 50px;">
+        <p><strong>Signature</strong></p>
+        <br/><br/><br/>
+        <p t-esc="user.name" style="text-decoration: underline;" />
+    </div>
+</t>
 
                 <div class="clearfix" name="so_total_summary">
                     <div id="total" class="row" name="total">

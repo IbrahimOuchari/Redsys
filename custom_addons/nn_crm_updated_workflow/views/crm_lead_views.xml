@@ -110,7 +110,7 @@
                             <field name="taux_change" width="100px" optional="hide"/>
                             <field name="total_dinar" width="100px" sum="Prix Tot DT"/>
                             <field name="estimation_transport_dinar" width="100px" sum="Tot Transport DT"/>
-                            <field name="taux_dd_id" width="100px" widget="percentage" />
+                            <field name="taux_dd_id" width="100px" />
                             <field name="fee_dd" width="100px" sum="Tot DD"/>
                             <field name="taux_change" width="100px" widget="percentage"/>
                             <field name="transit" width="100px" sum="Tot Transit DT"/>
@@ -121,30 +121,7 @@
                             <field name="prix_final" width="100px" sum="Tot Prix Final DT"/>
                             <field name="price_unit" width="100px" />
                         </tree>
-                        <form>
-                            <sheet>
-                                <group>
-                                    <field name="pn"/>
-                                    <field name="product_id"/>
-                                    <field name="quantity" width=""/>
-                                    <field name="prix_unitaire"/>
-                                    <field name="estimation_transport_devis"/>
-                                    <field name="total_devis"/>
-                                    <field name="total_dinar"/>
-                                    <field name="estimation_transport_dinar"/>
-                                    <field name="taux_dd_id"/>
-                                    <field name="fee_dd"/>
-                                    <field name="taux_change"/>
-                                    <field name="transit"/>
-                                    <field name="cert"/>
-                                    <field name="prix_revient"/>
-                                    <field name="margin_percentage" widget="percentage"/>
-                                    <field name="margin"/>
-                                    <field name="prix_final"/>
-                                    <field name="price_unit"/>
-                                </group>
-                            </sheet>
-                        </form>
+
                     </field>
                 </page>
                 <!--                <page string="Lignes de coût" invisible="not rfq_created">-->
