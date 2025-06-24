@@ -138,6 +138,20 @@
                         </t>
                     </tbody>
                 </table>
+
+                <div class="clearfix" name="so_total_summary">
+                    <div id="total" class="row" name="total">
+                        <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
+                            <table class="table table-sm table-borderless">
+                                <t t-set="tax_totals" t-value="doc.tax_totals"/>
+                                <t t-call="sale.document_tax_totals"/>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="oe_structure"></div>
+
 <t t-if="user.signature">
     <div class="text-center" style="margin-top: 50px;">
         <p><strong>Signature</strong></p>
@@ -154,31 +168,6 @@
     </div>
 </t>
 
-                <div class="clearfix" name="so_total_summary">
-                    <div id="total" class="row" name="total">
-                        <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
-                            <table class="table table-sm table-borderless">
-                                <t t-set="tax_totals" t-value="doc.tax_totals"/>
-                                <t t-call="sale.document_tax_totals"/>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="oe_structure"></div>
-
-                <div t-if="not doc.signature" class="oe_structure"></div>
-                <div t-else="" class="mt-4 ml64 mr4" name="signature">
-                    <div class="offset-8">
-                        <strong>Signature</strong>
-                    </div>
-                    <div class="offset-8">
-                        <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
-                    </div>
-                    <div class="offset-8 text-center">
-                        <span t-field="doc.signed_by"/>
-                    </div>
-                </div>
 
                 <div>
                     <span t-field="doc.note"
