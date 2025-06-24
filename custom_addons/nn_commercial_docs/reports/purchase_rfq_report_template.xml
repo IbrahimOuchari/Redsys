@@ -112,6 +112,10 @@
                     </t>
                 </tbody>
             </table>
+
+
+            <p t-field="o.notes" class="mt-4"/>
+
 <t t-if="user.signature">
     <div class="text-center" style="margin-top: 50px;">
         <p><strong>Signature</strong></p>
@@ -127,22 +131,6 @@
         <p t-esc="user.name" style="text-decoration: underline;" />
     </div>
 </t>
-
-            <p t-field="o.notes" class="mt-4"/>
-
-            <!-- Signature section -->
-            <div class="row mt-5">
-                <div class="col-6">
-                    <p><span t-field="o.company_id.name"/>:</p>
-                    <div style="height: 70px;"></div>
-
-                </div>
-                <div class="col-6">
-                    <p><span t-field="o.partner_id.name"/>:</p>
-                    <div style="height: 70px;"></div>
-
-                </div>
-            </div>
 
             <div class="oe_structure"/>
         </div>
