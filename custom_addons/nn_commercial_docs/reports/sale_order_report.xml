@@ -168,13 +168,7 @@
         <p t-esc="user.name" style="margin-top: 5px;" />
     </div>
 </t>
-<t t-else="">
-    <div class="text-center" style="margin-top: 50px;">
-        <p><strong>Signature</strong></p>
-        <br/><br/><br/>
-        <p t-esc="user.name" style="text-decoration: underline;" />
-    </div>
-</t>
+
 
             <div>
                 <span t-field="doc.note" t-attf-style="#{'text-align:justify;text-justify:inter-word;' if doc.company_id.terms_type != 'html' else ''}" name="order_note"/>
